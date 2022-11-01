@@ -2,9 +2,16 @@
 
 ## Introduction
 
-Every computer program executes a sequence of elementary arithmetic operations and elementary functions. By applying the chain rule repeatedly to these operations, derivatives of arbitrary order can be computed automatically, and accurately, to working precision. This process is known as Automatic Differentiation.
+Every computer program executes a sequence of elementary arithmetic operations and elementary functions. By applying the chain rule repeatedly to these operations, derivatives of arbitrary order can be computed automatically, and accurately, to working precision. This process is known as Automatic Differentiation.In this project, our group aims to develop an auto-differentiation API that supports forward and reverse modes. 
 
-Our group aims to develop a auto-differentiation API that supports forward and reverse mode. The importance of solving this problem stems from the widespread uses and applications of automatic differentiation, especially in scientific computing and science in general.
+
+Python users and the developer community may ask the question "why AD?". We would like to take a moment to emphasize the importance of this topic. The necessity of this project stems from the widespread uses and applications of automatic differentiation, especially in scientific computing and science in general. 
+
+Derivatives play a critical role in computational statistics and are commonly calculated via symbolic  or numerical differentiation methods. Both of these classical methods have shortcomings involving inefficient code and round-off errors. More importantly, these methods are slow at computing partial derivatives with respect to many inputs (i.e the gradient).
+
+Automatic differentiation is a refined method used to evaluate derivatives and forms the basis of gradient-based learning. Gradient-based optimization algorithms have a wide range of applications including linear regression, classification algorithms, and backpropagation in Neural Networks. For these reasons, we believe that automatic differentiation is a very important and necessary topic. 
+
+For this last example, recall that neural networks calculate their output by multiplying features by weights, summing them, and applying activation functions to obtain non-linear mappings. In this case, manually calculating partial derivatives for weights may be error-prone. Automatic differentiation then comes into play to automate this procedure. 
 
 Essentially, the package inspects a sequence of elementary operations given as a Python function. The software then
 converts the sequence into a computational graph from which we can readily compute derivatives for arbitrary functions and points.
@@ -212,20 +219,39 @@ Further detailed descriptions for classes, methods, and basic operations will be
 What classes do you need and what will you implement first?:
 
 - Node : foundation of our computational graphs
-  - parents : parent node(s)
-  - children : child node(s)
-- Graph: computational graph ; this is our core data structure
-  - root_nodes : root node(s) of the graph
-  - tail_nodes : tail node(s) of the graph (for reverse mode)
-- Function : creates user defined functions
-  - graph : computational graph to compute derivative
-  - derivative : returns derivate at given input using forward or reverse mode (specified via key word argument)
-  - Our function class will handle multi-output functions using multiple Python function inputs (see How to Use above)
+  - References to related nodes will be stored in a dictionary.
+  - A well designed node class is sufficient for our project
+  - data: the data that the node is storing
+  - derivatives : keeps track of our derivative with respect to each parent in the chain rule
+  - computation : keeps track of relations/operations for our computational graph
+- functions: module with overridden numpy functions and a class that allows users to create user defined functions (e.g. polynomials):
+  - Function: Class that allows users to creates user defined functions $f$ defined by the user e.g. ($x^2+3x+2$)
+  - derivative : derivate $df$ at given input using forward or reverse mode (specified via key word argument)
+  - Our function class will handle multi-output functions using multiple Python function inputs (see how to use above)
+  - overridden functions will implement `sin`, `cos`, `tan`, `epx`, etc. and provide their derivatives
+  - these overridden functions will be wrapper functions for commonly used numpy functions.
+  - users can import and use these functions if they choose as seen in the `How to Use` section
 - Dual : supports creation and computation of dual numbers
-  - We will implement a variety of dunder methods for basic operations (addition, subtraction,...)
+  - We will override dunder methods for basic operations between dual numbers
+  - `__add__`: $z_1 + z_2 = (a_1 + b_1\epsilon) + (a_2 + b_2\epsilon) = (a_1 + b_2) + (b_1 + b_2)\epsilon$
+  - `__sub__`: $z_1 + z_2 = (a_1 + b_1\epsilon) - (a_2 + b_2\epsilon) = (a_1 - b_2) + (b_1 - b_2)\epsilon$
+  - `__mul__`: $z_1z_2=(a_1 + b_1\epsilon)(a_2 + b_2\epsilon)= (a_1a_2) + (a_1b_2 + a_2b_1)\epsilon$
+  - `__truediv__`: $\frac{z_1}{z_2}=\frac{(a_1 + b_1\epsilon)}{(a_2 + b_2\epsilon)} = \frac{a_1}{a_2} + \frac{b_1a_2 - a_1b_2}{a_1^2}\epsilon$, assuming $z_2% is non-zero
+  - `__pow__`: $z1z1...z1 = a_1 + b_1\epsilon)(a_1 + b_1\epsilon)...(a_1 + b_1\epsilon)$
+  - `__neg__`: $-z1$
+  - `__radd__`, `__rsub__`, and other `__r*__` methods to support operations between ints/floats
 
 In addition, we will implement a suite of elementary functions with known derivatives which will natively integrate with our Function and Graph classes. We will rely on our one dependency -- Numpy -- for computation, but incorporate methods to merge computations into a given function's graph.
 
 ## Licensing
 
 We will use an open source license, specifically the MIT License. This license places minimal restrictions on our end users and enables them to freely use and improve upon our project. Additionally, this license minimizes legal obligations for our team.
+
+# Feedback
+## milestone 1
+Feedback Requested per [@jeb255](https://code.harvard.edu/jeb2550)
+- More elaborate introduction regarding the importance of AD -> See Indroduction -> Paragraphs 2 forward
+- More detailed explanation for node class -> See Implementation -> Node
+- Using a dictionary instead of a graph -> See Implementation -> Node
+- Explain how we will implement tan, sin, cos ? See Implementation -> functions
+- Implement add/sub/mul etc. - See Implementation -> Dual 
