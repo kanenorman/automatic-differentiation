@@ -15,10 +15,14 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install dependencies 
-        run: python -m pip install build pytest # `build` for building our package and `pytest` to run test suite; we might need to install other test packages such as pytest-cov if James uses any others
-      - name: Build and install package in container # the package is not ready to test by defualt, we have to build it and then install it first
-        run: (python -m build --wheel && python -m pip install dist/*) # I belive `python -m build` builds the package in dist/ which it creates
-      - name: Run tests
-        run: python -m pytest -cov # not totally sure about this because I don't know what the final test suite directory structure will look like -- we'll know once James pushes. I'm assuming we'll have a test/ directory with a collection of .py files
+        run: python -m pip install build pytest
+      - name: Build and install package in container
+        run: (python -m build --wheel && python -m pip install dist/*)
+      - name: Run Code Coverage
+        run: python -m pytest --cov=autodiff_team29 tests/
+      - name: Extract Line Converage Percent
+        run:  COV_PCT=$(python -m pytest --cov=autodiff_team29/ tests/ | grep TOTAL | awk '{print$4}'| grep '[0-9]')
+      - name: Determine Pass Fail
+        run:  if [[ COV_PCT >=90 ]] ; then exit 0; else exit 1; fi
 
 
