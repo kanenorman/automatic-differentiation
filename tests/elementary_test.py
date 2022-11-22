@@ -2,8 +2,8 @@ import pytest
 import numpy as np
 from expects import expect, equal, raise_error, be_true, be_within
 
-import elementaries
-from node import Node
+from autodiff_team29 import elementaries
+from autodiff_team29.node import Node
 
 
 @pytest.fixture()

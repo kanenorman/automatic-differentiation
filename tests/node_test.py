@@ -5,7 +5,7 @@
 
 import pytest
 
-from node import Node
+from autodiff_team29.node import Node
 
 import numpy as np
 
@@ -456,32 +456,32 @@ class Tests_Node:
 
     def test_pow(self):
         # Int:
-        node1 = Node('v2', 100, 1)
-        node2 = Node('v3',100, 1)
+        node1 = Node('v21', 100, 1)
+        node2 = Node('v22',100, 1)
         
         new_node = node1.__pow__(node2)
-        assert new_node.symbol == "(v2**v3)"
+        assert new_node.symbol == "(v21**v22)"
         assert new_node.derivative == 100*100**(99)
-        assert new_node.value == 10000
+        assert new_node.value == 100**100
 
         # Float:
-        node1 = Node('v2', 100, 1)
-        node2 = Node('v3',100.00, 1)
+        node1 = Node('v16', 100, 1)
+        node2 = Node('v19',100.00, 1)
         
         new_node = node1.__pow__(node2)
-        assert new_node.symbol == "(v2**v3)"
+        assert new_node.symbol == "(v16**v19)"
         assert new_node.derivative == 100*100.00**(99)
-        assert new_node.value == 10000.0
+        assert new_node.value == 1e200
 
     def test_pow_array(self):
-        node1 = Node('v2', 100, 1)
-        node2 = Node('v3',np.array([1,1,1]), 1)
+        node1 = Node('v4', 2, 1)
+        node2 = Node('v5',np.array([1]), 1)
 
         new_node = node1.__pow__(node2)
 
-        assert new_node.symbol == "(v2**v3)"
-        assert new_node.derivative == np.array([1,1,1])*100**(100-np.array([1,1,1]))
-        assert new_node.value == 100*(np.array([1,1,1]))
+        assert new_node.symbol == "(v4**v5)"
+        assert all(new_node.derivative == np.array([1]))
+        assert all(new_node.value == np.array([2]))
 
     def test_str(self):
         # Int

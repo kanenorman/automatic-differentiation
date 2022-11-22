@@ -1,6 +1,6 @@
 import numpy as np
 
-from autodiff.node import Node
+from autodiff_team29.node import Node
 
 
 def _check_log_domain_restrictions(x):
@@ -102,7 +102,7 @@ def _check_arccos_domain_restrictions(x):
     >>> _check_arccos_domain_restrictions(Node("-5",-1,0))
     ValueError:
     """
-    if np.abs(x) > 1:
+    if np.abs(x.value) > 1:
         raise ValueError(f"{x.value} is not within the domain [-1,1] of f(x)=arccos(x)")
 
 def _check_arcsin_domain_restrictions(x):
@@ -135,7 +135,7 @@ def _check_arcsin_domain_restrictions(x):
     >>> _check_arccos_domain_restrictions(Node("-5",-1,0))
     ValueError:
     """
-    if np.abs(x) > 1:
+    if np.abs(x.value) > 1:
         raise ValueError(f"{x.value} is not within the domain [-1,1] of f(x)=arcsin(x)")
 
 def sqrt(x):
@@ -176,7 +176,7 @@ def sqrt(x):
     _check_sqrt_domain_restrictions(x)
 
     forward_trace = np.sqrt(x.value)
-    tangent_trace = x.derivative / 2 * np.sqrt(x.value)
+    tangent_trace = x.derivative / (2 * np.sqrt(x.value))
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
     Node._insert_node_to_registry(new_node)
     return new_node
@@ -476,7 +476,7 @@ def tan(x):
     x = Node._convert_to_node(x)
 
     forward_trace = np.tan(x.value)
-    tangent_trace = x.derivative / (np.cos(x.val) ** 2)
+    tangent_trace = x.derivative / (np.cos(x.value) ** 2)
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
     Node._insert_node_to_registry(new_node)
     return new_node
@@ -601,15 +601,10 @@ def arctan(x):
 
     x = Node._convert_to_node(x)
 
-    forward_trace = np.arccos(x.value)
-    tangent_trace = -x.derivative / (1 + x.value**2)
+    forward_trace = np.arctan(x.value)
+    tangent_trace = x.derivative / (1 + x.value**2)
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
     Node._insert_node_to_registry(new_node)
     return new_node
 
 
-if __name__ == "__main__":
-    x = Node("x", 5, 1)
-    z = log2(x)
-
-    print(z.value)

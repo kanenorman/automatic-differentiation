@@ -291,7 +291,7 @@ class Node:
         return new_node
 
     def __pow__(self, exponent):
-        symbolic_representation = "({}**{})".format(str(exponent), self._symbol)
+        symbolic_representation = "({}**{})".format(self._symbol, str(exponent))
 
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
