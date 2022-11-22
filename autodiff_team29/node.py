@@ -320,9 +320,3 @@ class Node:
         derivative_equal = self._derivative = other._derivative
 
         return all([symbolic_representation_equal, value_equal, derivative_equal])
-
-
-if __name__ == "__main__":
-    x = Node("x", 3, 1)
-    z = -x
-    print(z._NODE_REGISTRY)

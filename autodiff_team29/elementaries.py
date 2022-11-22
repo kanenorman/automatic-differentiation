@@ -75,7 +75,7 @@ def _check_sqrt_domain_restrictions(x):
 def _check_arccos_domain_restrictions(x):
     """
     Checks if the value of a given input x is less zero and therefore
-    unable to be used as an input for a square root function.
+    unable to be used as an input for the arccos function.
 
     Parameters
     ----------
@@ -108,7 +108,7 @@ def _check_arccos_domain_restrictions(x):
 def _check_arcsin_domain_restrictions(x):
     """
     Checks if the value of a given input x is less zero and therefore
-    unable to be used as an input for a square root function.
+    unable to be used as an input for the arcsin function.
 
     Parameters
     ----------
