@@ -8,6 +8,6 @@
 > [Luke Stoner](https://code.harvard.edu/lus881).   
 
 ## Testing
-![run test](https://code.harvard.edu/CS107/team29/actions/workflows/run_tests.yml/badge.svg?branch=main?event=push)  
-  
-![code coverage](https://code.harvard.edu/CS107/team29/actions/workflows/code_coverage.yml/badge.svg?branch=main?event=push).   
+![run test](https://code.harvard.edu/CS107/team29/actions/workflows/run_tests.yml/badge.svg?event=push?branch=main)  
+ 
+![code coverage](https://code.harvard.edu/CS107/team29/actions/workflows/code_coverage.yml/badge.svg?event=push?branch=main).   
