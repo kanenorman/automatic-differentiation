@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "autodiff-team29"
-version = "0.1.0"
-description = "Automatic Differentation in Python"
+name = "alpha-delta-team29"
+version = "0.1.1"
+description = "derivatives, chain rule, and other cool stuff"
 authors = [
         "Andrew <andrewsullivan@g.harvard.edu>", 
         "Evan evanarnold@college.harvard.edu", 

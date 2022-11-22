@@ -20,4 +20,15 @@ jobs:
         run: (python -m build --wheel && python -m pip install dist/*) # I belive `python -m build` builds the package in dist/ which it creates
       - name: Run tests
         run: python -m pytest # not totally sure about this because I don't know what the final test suite directory structure will look like -- we'll know once James pushes. I'm assuming we'll have a test/ directory with a collection of .py files
-
+      - name: Build a binary wheel and a source tarball
+        run: >-
+          python -m
+          build
+          --sdist
+          --wheel
+          --outdir dist/
+      - name: Publish distribution 📦 to Test PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
