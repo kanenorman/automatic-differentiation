@@ -44,7 +44,7 @@ class VectorFunction:
         Returns the symbolic representation of the vector function
 
         """
-        return np.array([function.symbol for function in self._functions])
+        return str(np.array([function.symbol for function in self._functions]))
 
     @property
     def value(self) -> NDArray[float]:
