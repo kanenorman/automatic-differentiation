@@ -414,10 +414,6 @@ class TestNodeOperators:
         Function that tests correct output for __pow__ method.
 
         """
-        """
-        Function that tests correct output for __truediv__ method
-
-        """
         node1 = Node("v0", 3, 1)
 
         # int case
@@ -439,11 +435,11 @@ class TestNodeOperators:
         new_node = node1**other
         expect(new_node.symbol).to(equal("(v0**v1)"))
         expect(new_node.value).to(equal(9))
-        # expect(new_node.derivative).to(equal(1/101**2)) # TODO: inspect dual numer power rule
+        expect(np.isclose(new_node.derivative, 2 * 3**1 + 3**2  * np.log(3))).to(equal(True))
 
     def test_str(self):
         """
-        Function that tests correct output for __pow__ method.
+        Function that tests correct output for __str__ method.
 
         """
         # int case

@@ -381,7 +381,7 @@ class Node:
 
         exponent = self.convert_to_node(exponent)
         primal_trace = self._value**exponent._value
-        tangent_trace = exponent._value * self._value ** (exponent._value - 1)
+        tangent_trace = self._value**exponent._value * (exponent._derivative * np.log(self._value) + (self._derivative * exponent._value) / self._value)
 
         return Node(
             symbolic_representation, primal_trace, tangent_trace, supress_warning=True
