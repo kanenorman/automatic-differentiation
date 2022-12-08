@@ -18,7 +18,15 @@ jobs:
         run: python -m pip install build pytest expects
       - name: Build and install package in container
         run: (python -m build --wheel && python -m pip install dist/*)
-      - name: Run Code Coverage
+      - name: Code Coverage HTML
+        run: python -m pytest --cov=autodiff_team29 tests/ --cov-report=html:tests/htmlcov
+      - name: Clean .gitignore in coverage output
+        run: rm -f tests/htmlcov/.gitignore
+      - name: Deploy test coverage to GitHub page
+        uses:  JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: tests/htmlcov
+      - name: Run Code Coverage for README badge
         run: python -m pytest --cov=autodiff_team29 tests/
       - name: Extract Line Converage Percent
         run:  COV_PCT=$(python -m pytest --cov=autodiff_team29/ tests/ | grep TOTAL | awk '{print$4}'| grep '[0-9]')
