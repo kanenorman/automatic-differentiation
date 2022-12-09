@@ -100,21 +100,31 @@ class TestMathFunctions:
         base = 10
         expect(elementaries.log(value, base).symbol).to(equal("log10(10)"))
         expect(elementaries.log(value, base).value).to(equal(np.log10(10)))
-        expect(elementaries.log(value, base).derivative).to(equal(1 / (10 * np.log(10))))
+        expect(elementaries.log(value, base).derivative).to(
+            equal(1 / (10 * np.log(10)))
+        )
 
         # float case
         value = 10.0
         base = 2
         expect(elementaries.log(value, base).symbol).to(equal("log2(10.0)"))
-        expect(np.isclose(elementaries.log(value, base).value, np.log2(10.0))).to(equal(True))
-        expect(np.isclose(elementaries.log(value, base).derivative, 1 / (10 * np.log(2)))).to(equal(True))
+        expect(np.isclose(elementaries.log(value, base).value, np.log2(10.0))).to(
+            equal(True)
+        )
+        expect(
+            np.isclose(elementaries.log(value, base).derivative, 1 / (10 * np.log(2)))
+        ).to(equal(True))
 
         # node case
         value = Node("x", 10, 1)
         base = 10
         expect(elementaries.log(value, base).symbol).to(equal("log10(x)"))
-        expect(np.isclose(elementaries.log(value, base).value, np.log10(10))).to(equal(True))
-        expect(np.isclose(elementaries.log(value, base).derivative, 1 / (10 * np.log(10)))).to(equal(True))
+        expect(np.isclose(elementaries.log(value, base).value, np.log10(10))).to(
+            equal(True)
+        )
+        expect(
+            np.isclose(elementaries.log(value, base).derivative, 1 / (10 * np.log(10)))
+        ).to(equal(True))
 
     def test_exp(self):
         """

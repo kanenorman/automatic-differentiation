@@ -7,21 +7,23 @@ from numpy.typing import NDArray
 
 
 class Node:
-
     # other types that are capable of being converted to Node
     _COMPATIBLE_VALUE_TYPES = (int, float)
     _COMPATIBLE_DERIVATIVE_TYPES = (int, float, np.ndarray)
 
     # store nodes that have been computed previously
+    _OVERWRITE_MODE = False
     _NODE_REGISTRY = {}
+
+    # only to be used for our benchmarking example
+    # not to be used for any other purpose
+    _NODES_COMPUTED_FOR_BENCHMARKING = 0
 
     def __new__(
         cls,
         symbol: str,
         value: Union[float, int],
         derivative: Union[int, float],
-        overwrite_existing: bool = False,
-        supress_warning: bool = False,
         **kwargs,
     ) -> Node:
         """
@@ -60,14 +62,8 @@ class Node:
 
         """
         # check if node already exist before recreating
-        if not overwrite_existing:
-            if cls._check_node_exists(symbol):
-                if not supress_warning:
-                    warnings.warn(
-                        f"Node with symbol {symbol} already exist. Using existing node!",
-                        RuntimeWarning,
-                    )
-                return cls._get_existing_node(symbol)
+        if cls._check_node_exists(symbol):
+            return cls._get_existing_node(symbol)
 
         # ensure that the values and derivatives specified are of the correct datatype
         # if they are not these methods will raise an exception
@@ -86,8 +82,11 @@ class Node:
         else:
             instance._derivative = derivative
 
-        cls._insert_node_to_registry(instance)
+        if not cls._OVERWRITE_MODE:
+            cls._insert_node_to_registry(instance)
 
+        # for benchmarking purposes only
+        cls._NODES_COMPUTED_FOR_BENCHMARKING += 1
         return instance
 
     @property
@@ -171,9 +170,9 @@ class Node:
             )
 
     @classmethod
-    def convert_to_node(cls, to_convert) -> Node:
+    def _convert_numeric_type_to_node(cls, to_convert: Union[int, float]) -> Node:
         """
-        Attempts to convert an numeric value into an instance of class Node.
+        Attempts to convert a numeric value into an instance of class Node.
 
         Parameters
         ----------
@@ -193,9 +192,10 @@ class Node:
         if isinstance(to_convert, Node):
             return to_convert
 
-        Node._check_foreign_value_type_compatibility(to_convert)
         return cls(
-            symbol=str(to_convert), value=to_convert, derivative=0, supress_warning=True
+            symbol=str(to_convert),
+            value=to_convert,
+            derivative=0,
         )
 
     @staticmethod
@@ -214,7 +214,7 @@ class Node:
             True if key argument is found. False otherwise.
 
         """
-        return key in Node._NODE_REGISTRY
+        return key in Node._NODE_REGISTRY if not Node._OVERWRITE_MODE else False
 
     @staticmethod
     def _get_existing_node(key: str) -> Node:
@@ -232,6 +232,7 @@ class Node:
             instance that matches the specified key.
 
         """
+
         return Node._NODE_REGISTRY[key]
 
     @staticmethod
@@ -252,6 +253,60 @@ class Node:
         """
         Node._NODE_REGISTRY[node._symbol] = node
 
+    @classmethod
+    def count_nodes_stored(cls):
+        """
+        Returns the number of nodes stored in the registry
+        """
+        return len(Node._NODE_REGISTRY)
+
+
+    @classmethod
+    def set_overwrite_mode(cls, enabled: bool) -> None:
+        """
+        Allows existing nodes to be recomputed.
+        Turning on override mode will
+        Be warned, this will result in a performance decrease!
+
+        Parameters
+        ---------
+        enabled : bool
+            If true, existing nodes will be recomputed.
+            Otherwise, existing computations will be retrieved from the node registry.
+        """
+
+        # if trying to set the mode to the current status, do nothing
+        if cls._OVERWRITE_MODE == enabled:
+            warnings.warn(
+                f"Override mode is already set to {enabled}. Expect no changes",
+                RuntimeWarning,
+            )
+            return
+
+        # if enabling overwriting, be sure to warn user
+        if enabled == True:
+            warnings.warn(
+                f"Override mode is enabled. Nodes with the same symbolic representation will be recomputed. "
+                f"Expect potential performance decrease",
+                RuntimeWarning,
+            )
+            # clear registry when overwrite mode is enabled because we will not need it
+            cls.clear_node_registry()
+
+        # if enabling is switched to false, be sure to warn th user
+        if enabled == False:
+            warnings.warn(
+                f"Override mode is disabled enabled. Nodes with the same symbolic representation will not be recomputed",
+                RuntimeWarning,
+            )
+
+        # set the overwrite mode to what the user specified
+        cls._OVERWRITE_MODE = enabled
+
+        # # for benchmarking extension, when mode is switched be sure to restart the count
+        # Node._NODES_COMPUTED_FOR_BENCHMARKING = 0
+
+
     @staticmethod
     def clear_node_registry() -> None:
         """
@@ -267,12 +322,14 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        other = self.convert_to_node(other)
+        other = self._convert_numeric_type_to_node(other)
         primal_trace = self._value + other._value
         tangent_trace = self._derivative + other._derivative
 
         return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
+            symbolic_representation,
+            primal_trace,
+            tangent_trace,
         )
 
     def __radd__(self, other: Union[int, float]) -> Node:
@@ -285,13 +342,11 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        other = self.convert_to_node(other)
+        other = self._convert_numeric_type_to_node(other)
         primal_trace = self._value - other._value
         tangent_trace = self._derivative - other._derivative
 
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
-        )
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __rsub__(self, other: Union[int, float]) -> Node:
 
@@ -300,13 +355,11 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        other = self.convert_to_node(other)
+        other = self._convert_numeric_type_to_node(other)
         primal_trace = other._value - self._value
         tangent_trace = other._derivative - self._derivative
 
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
-        )
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __mul__(self, other: Union[int, float, Node]) -> Node:
 
@@ -315,15 +368,13 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        other = self.convert_to_node(other)
+        other = self._convert_numeric_type_to_node(other)
         primal_trace = self._value * other._value
         tangent_trace = (
             self._value * other._derivative + other._value * self._derivative
         )
 
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
-        )
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __rmul__(self, other: Union[int, float]) -> Node:
         return self.__mul__(other)
@@ -334,15 +385,13 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        other = self.convert_to_node(other)
+        other = self._convert_numeric_type_to_node(other)
         primal_trace = self._value / other._value
         tangent_trace = (
             self._derivative * other._value - self._value * other._derivative
         ) / other._value**2
 
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
-        )
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __rtruediv__(self, other: Union[int, float]) -> Node:
         symbolic_representation = "({}/{})".format(str(other), self._symbol)
@@ -350,15 +399,13 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        other = self.convert_to_node(other)
+        other = self._convert_numeric_type_to_node(other)
         primal_trace = other._value / self._value
         tangent_trace = (
             self._value * other._derivative - other._value * self._derivative
         ) / self._value**2
 
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
-        )
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __neg__(self) -> Node:
         symbolic_representation = "-{}".format(self._symbol)
@@ -369,9 +416,7 @@ class Node:
         primal_trace = -1 * self._value
         tangent_trace = -1 * self._derivative
 
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
-        )
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __pow__(self, exponent: Union[int, float, Node]) -> Node:
         symbolic_representation = "({}**{})".format(self._symbol, str(exponent))
@@ -379,13 +424,29 @@ class Node:
         if self._check_node_exists(symbolic_representation):
             return self._get_existing_node(symbolic_representation)
 
-        exponent = self.convert_to_node(exponent)
+        exponent = self._convert_numeric_type_to_node(exponent)
         primal_trace = self._value**exponent._value
-        tangent_trace = self._value**exponent._value * (exponent._derivative * np.log(self._value) + (self._derivative * exponent._value) / self._value)
-
-        return Node(
-            symbolic_representation, primal_trace, tangent_trace, supress_warning=True
+        tangent_trace = self._value**exponent._value * (
+            exponent._derivative * np.log(self._value)
+            + (self._derivative * exponent._value) / self._value
         )
+
+        return Node(symbolic_representation, primal_trace, tangent_trace)
+
+    def __rpow__(self, base: Union[int, float]) -> Node:
+        symbolic_representation = "({}**{})".format(str(base), self._symbol)
+
+        if self._check_node_exists(symbolic_representation):
+            return self._get_existing_node(symbolic_representation)
+
+        base = self._convert_numeric_type_to_node(base)
+        primal_trace = base._value**self._value
+        tangent_trace = base._value**self._value * (
+            self._derivative * np.log(base._value)
+            + (base._derivative * self._value) / base._value
+        )
+        
+        return Node(symbolic_representation, primal_trace, tangent_trace)
 
     def __str__(self) -> str:
         return self._symbol

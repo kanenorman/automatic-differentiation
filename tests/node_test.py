@@ -9,7 +9,8 @@ from autodiff_team29.node import Node
 
 class TestNodeRegistry:
     """
-    Test that the node registry is properly adding and removing nodes
+    Test that the node registry is properly adding and removing nodes.
+    There are a lot of global variables in the class scope that require extensive testing.
 
     """
 
@@ -33,6 +34,16 @@ class TestNodeRegistry:
 
         expect(Node._NODE_REGISTRY).to(be_empty)
 
+    def test_clear_node_registry_resets_count_of_nodes(self):
+        """
+        Verify that Node.clear_registry() removes all keys from the _NODE_REGISTRY
+
+        """
+        Node._NODE_REGISTRY = {"key": "value"}
+        Node.clear_node_registry()
+
+        expect(Node.count_nodes_stored()).to(be(0))
+
     def test_precomputed_nodes_can_be_retrieved(self):
         """
         Verify that once a node is created, the exact same instance can be retrieved
@@ -43,6 +54,50 @@ class TestNodeRegistry:
         retrieved_node = Node._get_existing_node("a")
 
         expect(retrieved_node).to(be(x))
+
+    def test_incrementing_node_count_while_overwrite_mode_is_false(self):
+        """
+        If overwrite mode is off, then we expect that each unique node
+        will increment the node count by one. Repeated symbols will not increment the count
+
+        """
+        # ensure overwrite mode is disabled
+        Node.set_overwrite_mode(False)
+
+        x = Node("first", 1, 1)
+        expect(Node.count_nodes_stored()).to(equal(1))
+
+        x = Node("second", 2, 1)
+        expect(Node.count_nodes_stored()).to(equal(2))
+
+        x = Node("third", 3, 1)
+        expect(Node.count_nodes_stored()).to(equal(3))
+
+        # repeat third symbol. count should not increment
+        x = Node("third", 4, 1)
+        expect(Node.count_nodes_stored()).to(equal(3))
+
+    def test_incrementing_node_count_while_overwrite_mode_is_true(self):
+        """ "
+        If overwrite mode is on, then we expect the number of nodes stored to remain zero
+        """
+
+        # enabling overwrite mode
+        Node.set_overwrite_mode(True)
+
+        x = Node("first", 1, 1)
+        expect(Node.count_nodes_stored()).to(equal(0))
+
+        x = Node("second", 2, 1)
+        expect(Node.count_nodes_stored()).to(equal(0))
+
+        x = Node("third", 3, 1)
+        expect(Node.count_nodes_stored()).to(equal(0))
+
+        # repeat third symbol. count should remain zero
+        x = Node("third", 4, 1)
+        expect(Node.count_nodes_stored()).to(equal(0))
+
 
 
 class TestNodeCreation:
@@ -71,27 +126,6 @@ class TestNodeCreation:
         expect(node._symbol).to(equal("b"))
         expect(node._value).to(equal(20))
         expect(all(node._derivative == np.array([0, 1]))).to(be_true)
-
-    def test_duplicate_initialization_with_default_argument_raises_warning(self):
-        """
-        Duplicating a node should raise a RuntimeWarning.
-
-        """
-        Node("duplicate_this_node", 100, 1)
-
-        with pytest.warns(RuntimeWarning):
-            Node("duplicate_this_node", 100, 1)
-
-    def test_duplicate_initialization_with_optional_argument_disables_warning(self):
-        """
-        Duplicating a node should raise a RuntimeWarning, but we are using an optional argument to supress the warning
-
-        """
-        Node("duplicate_this_node", 100, 1)
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("error")
-            Node("duplicate_this_node", 100, 1, supress_warning=True)
 
     def test_value(self):
         """
@@ -170,7 +204,7 @@ class TestNodeCreation:
         Validates that integers and floats can be converted to nodes
 
         """
-        node = Node.convert_to_node(value)
+        node = Node._convert_numeric_type_to_node(value)
 
         expect(node.symbol).to(equal(expected_symbol))
         expect(node.value).to(equal(value))
@@ -183,7 +217,7 @@ class TestNodeCreation:
 
         """
         with pytest.raises(TypeError):
-            Node.convert_to_node(value)
+            Node._convert_numeric_type_to_node(value)
 
 
 class TestNodeOperators:
@@ -435,7 +469,31 @@ class TestNodeOperators:
         new_node = node1**other
         expect(new_node.symbol).to(equal("(v0**v1)"))
         expect(new_node.value).to(equal(9))
-        expect(np.isclose(new_node.derivative, 2 * 3**1 + 3**2  * np.log(3))).to(equal(True))
+        expect(np.isclose(new_node.derivative, 2 * 3**1 + 3**2 * np.log(3))).to(
+            equal(True)
+        )
+
+    def test_rpow(self):
+
+        """
+        Function tests for __rpow__ method.
+
+        """
+        node1 = Node("v0", 3, 1)
+
+        # int case
+        other = 2
+        new_node = other ** node1
+        expect(new_node.symbol).to(equal("(2**v0)"))
+        expect(new_node.value).to(equal(8))
+        expect(new_node.derivative).to(equal(np.log(2) * 2**3))
+
+        # float case
+        other = 2.0
+        new_node = other ** node1
+        expect(new_node.symbol).to(equal("(2.0**v0)"))
+        expect(new_node.value).to(equal(8))
+        expect(new_node.derivative).to(equal(np.log(2) * 2**3))
 
     def test_str(self):
         """

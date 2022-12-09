@@ -3,6 +3,7 @@ import numpy as np
 import math
 from autodiff_team29 import Node
 
+
 def _check_log_domain_restrictions(x: Node) -> None:
     """
     Checks if the value of a given input x is less than or equal to zero and therefore
@@ -178,14 +179,14 @@ def sqrt(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_sqrt_domain_restrictions(x)
 
     forward_trace = np.sqrt(x.value)
     tangent_trace = x.derivative / (2 * np.sqrt(x.value))
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -223,7 +224,7 @@ def ln(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_log_domain_restrictions(x)
 
@@ -232,14 +233,14 @@ def ln(x: Union[int, float, Node]) -> Node:
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
-def log(x, base = np.e):
+def log(x, base=np.e):
     """
      Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the logarithm 
+     representation, forward trace, and tangent trace, which are based on the logarithm
      of the input node x and the provided base.
 
     Parameters
@@ -247,7 +248,7 @@ def log(x, base = np.e):
      x : Union[int, float, Node]
          An instance of the Node class, where x.value is the numeric value of the node and
          x.deriative is the derivative of the node.
-    
+
      base : Union[int, float]
         The desired base of the logorithm. Must be an integer or float greater than 1.
 
@@ -272,13 +273,13 @@ def log(x, base = np.e):
 
     """
     if not base > 1:
-        raise ValueError('Base must be greater than 1')
+        raise ValueError("Base must be greater than 1")
 
-    symbolic_representation = f'log{str(base)}({str(x)})'
+    symbolic_representation = f"log{str(base)}({str(x)})"
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_log_domain_restrictions(x)
 
@@ -287,8 +288,8 @@ def log(x, base = np.e):
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
-    return new_node  
+
+    return new_node
 
 
 def exp(x: Union[int, float, Node]) -> Node:
@@ -325,14 +326,14 @@ def exp(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.exp(x.value)
     tangent_trace = x.derivative * forward_trace
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -370,14 +371,14 @@ def sin(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.sin(x.value)
     tangent_trace = np.cos(x.value) * x.derivative
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -415,14 +416,14 @@ def cos(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.cos(x.value)
     tangent_trace = -np.sin(x.value) * x.derivative
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -460,14 +461,14 @@ def tan(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.tan(x.value)
     tangent_trace = x.derivative / (np.cos(x.value) ** 2)
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -505,14 +506,14 @@ def arcsin(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.arcsin(x.value)
     tangent_trace = x.derivative / np.sqrt(1 - x.value**2)
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -550,14 +551,14 @@ def arccos(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.arccos(x.value)
     tangent_trace = -x.derivative / np.sqrt(1 - x.value**2)
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
@@ -595,12 +596,12 @@ def arctan(x: Union[int, float, Node]) -> Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.arctan(x.value)
     tangent_trace = x.derivative / (1 + x.value**2)
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node
