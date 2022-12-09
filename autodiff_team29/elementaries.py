@@ -1,9 +1,7 @@
 from typing import Union
-
 import numpy as np
-
+import math
 from autodiff_team29 import Node
-
 
 def _check_log_domain_restrictions(x: Node) -> None:
     """
@@ -238,17 +236,20 @@ def ln(x: Union[int, float, Node]) -> Node:
     return new_node
 
 
-def log10(x: Union[int, float, Node]) -> Node:
+def log(x, base = np.e):
     """
      Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the base 10
-     logarithm of the input node x.
+     representation, forward trace, and tangent trace, which are based on the logarithm 
+     of the input node x and the provided base.
 
     Parameters
      ----------
      x : Union[int, float, Node]
          An instance of the Node class, where x.value is the numeric value of the node and
          x.deriative is the derivative of the node.
+    
+     base : Union[int, float]
+        The desired base of the logorithm. Must be an integer or float greater than 1.
 
      Returns
      -------
@@ -260,15 +261,20 @@ def log10(x: Union[int, float, Node]) -> Node:
 
      Examples
      --------
-     >>> log10(Node("1",1,0))
+     >>> log(Node("1",1,0), 10)
      Node("log10(1)", 0, 0.4343)
-     >>> log10(Node("0",0,0))
+     >>> log(Node("1",1,0), 2)
+     Node("log2(1)", 0, 1.4427)
+     >>> log(Node("0",0,0))
      ValueError: Value 0 not valid for a logarithmic function
-     >>> log10(Node("-1",-1,0))
+     >>> log(Node("-1",-1,0))
      ValueError: Value -1 not valid for a logarithmic function
 
     """
-    symbolic_representation = "log10({})".format(str(x))
+    if not base > 1:
+        raise ValueError('Base must be greater than 1')
+
+    symbolic_representation = f'log{str(base)}({str(x)})'
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
@@ -276,60 +282,13 @@ def log10(x: Union[int, float, Node]) -> Node:
 
     _check_log_domain_restrictions(x)
 
-    forward_trace = np.log10(x.value)
-    tangent_trace = 1 / (x.value * np.log(10))
+    forward_trace = math.log(x.value, base)
+    tangent_trace = 1 / (x.value * np.log(base))
     new_node = Node(
         symbolic_representation, forward_trace, tangent_trace, supress_warning=True
     )
     Node._insert_node_to_registry(new_node)
-    return new_node
-
-
-def log2(x: Union[int, float, Node]) -> Node:
-    """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the base 2
-     logarithm of the input node x.
-
-    Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
-
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node "log2({})", its forward trace, and
-         tangent trace.
-
-     Examples
-     --------
-     >>> log2(Node("1",1,0))
-     Node("log2(1)", 0, 1.4427)
-     >>> log2(Node("0",0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     >>> log2(Node("-1",-1,0))
-     ValueError: Value '-1' not valid for a logarithmic function
-
-    """
-    symbolic_representation = "log2({})".format(str(x))
-    if Node._check_node_exists(symbolic_representation):
-        return Node._get_existing_node(symbolic_representation)
-
-    x = Node.convert_to_node(x)
-
-    _check_log_domain_restrictions(x)
-
-    forward_trace = np.log2(x.value)
-    tangent_trace = 1 / (x.value * np.log(2))
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
-    return new_node
+    return new_node  
 
 
 def exp(x: Union[int, float, Node]) -> Node:

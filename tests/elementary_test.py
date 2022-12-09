@@ -10,7 +10,6 @@ class TestDomainRestrictions:
     def test_log_domain_raises_error_for_values_outside_domain(self):
         """
         Checks that a ValueError is raised for values outside the domain of logarithmic functions
-
         """
         node = Node("x", -2, 1)
         with pytest.raises(ValueError):
@@ -21,7 +20,6 @@ class TestDomainRestrictions:
     def test_sqrt_domain_raises_error_for_values_outside_domain(self):
         """
         Checks that a ValueError is raised for values outside the domain of sqrt
-
         """
         negative_two = Node("x", -2, 1)
         with pytest.raises(ValueError):
@@ -30,7 +28,6 @@ class TestDomainRestrictions:
     def test_arccos_domain_raises_error_for_values_outside_domain(self):
         """
         Checks that a ValueError is raised for values outside the domain of arccos
-
         """
         negative_two = Node("x", -2, 1)
         positive_two = Node("x", 2, 1)
@@ -41,7 +38,6 @@ class TestDomainRestrictions:
     def test_arcsin_domain_raises_error_for_values_outside_domain(self):
         """
         Checks that a ValueError is raised for values outside the domain of arcsin
-
         """
         negative_two = Node("x", -2, 1)
         positive_two = Node("x", 2, 1)
@@ -54,7 +50,6 @@ class TestMathFunctions:
     def test_sqrt(self):
         """
         Test square root function
-
         """
         # int case
         value = 9
@@ -77,7 +72,6 @@ class TestMathFunctions:
     def test_ln(self):
         """
         Test ln function
-
         """
         # int case
         value = 10
@@ -97,56 +91,34 @@ class TestMathFunctions:
         expect(elementaries.ln(value).value).to(equal(np.log(10)))
         expect(elementaries.ln(value).derivative).to(equal(1 / 10))
 
-    def test_log10(self):
+    def test_log(self):
         """
         Test log10 function
-
         """
         # int case
         value = 10
-        expect(elementaries.log10(value).symbol).to(equal("log10(10)"))
-        expect(elementaries.log10(value).value).to(equal(np.log10(10)))
-        expect(elementaries.log10(value).derivative).to(equal(1 / (10 * np.log(10))))
+        base = 10
+        expect(elementaries.log(value, base).symbol).to(equal("log10(10)"))
+        expect(elementaries.log(value, base).value).to(equal(np.log10(10)))
+        expect(elementaries.log(value, base).derivative).to(equal(1 / (10 * np.log(10))))
 
         # float case
         value = 10.0
-        expect(elementaries.log10(value).symbol).to(equal("log10(10.0)"))
-        expect(elementaries.log10(value).value).to(equal(np.log10(10.0)))
-        expect(elementaries.log10(value).derivative).to(equal(1 / (10 * np.log(10))))
+        base = 2
+        expect(elementaries.log(value, base).symbol).to(equal("log2(10.0)"))
+        expect(np.isclose(elementaries.log(value, base).value, np.log2(10.0))).to(equal(True))
+        expect(np.isclose(elementaries.log(value, base).derivative, 1 / (10 * np.log(2)))).to(equal(True))
 
         # node case
         value = Node("x", 10, 1)
-        expect(elementaries.log10(value).symbol).to(equal("log10(x)"))
-        expect(elementaries.log10(value).value).to(equal(np.log10(10)))
-        expect(elementaries.log10(value).derivative).to(equal(1 / (10 * np.log(10))))
-
-    def test_log2(self):
-        """
-        Test log2 function
-
-        """
-        # int case
-        value = 10
-        expect(elementaries.log2(value).symbol).to(equal("log2(10)"))
-        expect(elementaries.log2(value).value).to(equal(np.log2(10)))
-        expect(elementaries.log2(value).derivative).to(equal(1 / (10 * np.log(2))))
-
-        # float case
-        value = 10.0
-        expect(elementaries.log2(value).symbol).to(equal("log2(10.0)"))
-        expect(elementaries.log2(value).value).to(equal(np.log2(10.0)))
-        expect(elementaries.log2(value).derivative).to(equal(1 / (10 * np.log(2))))
-
-        # node case
-        value = Node("x", 10, 1)
-        expect(elementaries.log2(value).symbol).to(equal("log2(x)"))
-        expect(elementaries.log2(value).value).to(equal(np.log2(10)))
-        expect(elementaries.log2(value).derivative).to(equal(1 / (10 * np.log(2))))
+        base = 10
+        expect(elementaries.log(value, base).symbol).to(equal("log10(x)"))
+        expect(np.isclose(elementaries.log(value, base).value, np.log10(10))).to(equal(True))
+        expect(np.isclose(elementaries.log(value, base).derivative, 1 / (10 * np.log(10)))).to(equal(True))
 
     def test_exp(self):
         """
         Test exp function
-
         """
         # int case
         value = 1
@@ -169,7 +141,6 @@ class TestMathFunctions:
     def test_sin(self):
         """
         Test sin function
-
         """
         # int case
         value = 1
@@ -192,7 +163,6 @@ class TestMathFunctions:
     def test_cos(self):
         """
         Test cos function
-
         """
         # int case
         value = 1
@@ -215,7 +185,6 @@ class TestMathFunctions:
     def test_tan(self):
         """
         Test tan function
-
         """
         # int case
         value = 1
@@ -238,7 +207,6 @@ class TestMathFunctions:
     def test_arcsin(self):
         """
         Test arcsin function
-
         """
         # int case
         value = 1 / 2
@@ -263,7 +231,6 @@ class TestMathFunctions:
     def test_arccos(self):
         """
         Test arcsin function
-
         """
         # int case
         value = 1 / 2
@@ -288,7 +255,6 @@ class TestMathFunctions:
     def test_arctan(self):
         """
         Test arcsin function
-
         """
         # int case
         value = 1 / 2
