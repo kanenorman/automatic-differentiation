@@ -199,8 +199,7 @@ returns int, float, or np.ndarray: Derivative with respect to the value attribut
 
 #### *elementaries.sqrt (function)*
 #### *elementaries.ln (function)*
-#### *elementaries.log10 (function)*
-#### *elementaries.log2 (function)*
+#### *elementaries.log (function)*
 #### *elementaries.exp (function)*
 #### *elementaries.sin (function)*
 #### *elementaries.cos (function)*
@@ -327,6 +326,8 @@ TODO
 
 ## Future Features
 
-The current implementation only support forward mode AD. We plan to implement support for reverse mode in the near future (see the background section above for details on forward and reverse mode AD). We would like our package to be efficient for functions of many inputs such as large neural networks; reverse mode AD is much more efficient than forward mode as the ratio of input dimension to output dimension grows. 
+The current implementation only support forward mode AD. We would like to implement support for reverse mode in the future (see the background section above for details on forward and reverse mode AD). We would like our package to be efficient for functions of many inputs such as large neural networks; reverse mode AD is much more efficient than forward mode as the ratio of input dimension to output dimension grows. Our node registry would also help to make reverse mode even more efficient.
 
 This will require a new graph structure of functions, but we should be able to utilize our forward mode node registry to perform the requisite forward pass before computing derivatives. The new graph structure will likely live in a new module, ```reverse```. We will have to add support for reverse mode to functions in ```elementaries``` and to the dunder methods in of the ```Node``` class. 
+
+Lastly, we would like to add gradient descent to our implementation, which is especially useful for neural networks. The use of neural networks continues to grow across many industries, so the addition of gradient descent would be important to maximize the usefullness of package.
