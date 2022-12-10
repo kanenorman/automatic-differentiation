@@ -318,7 +318,13 @@ If the wishes to disable the registry for a function with simple, unique computa
 
 ### Broader Impact
 
-TODO
+Automatic differentiation is a powerful tool with the potential to have a broad impact across a range of fields. In particular, it has the potential to greatly accelerate research and development in the fields of machine learning and artificial intelligence, where it can be used to more efficiently and effectively train complex models.
+
+Beyond its applications in these fields, automatic differentiation also has the potential to benefit other areas of science and engineering that rely on the solution of complex optimization problems. This includes fields such as computational biology, finance, and physics, among others.
+
+Furthermore, the development and widespread adoption of automatic differentiation techniques has the potential to promote inclusivity and equality in the field of computer science. By making it easier and more efficient to develop and train complex models, automatic differentiation can help to level the playing field and provide opportunities for individuals and communities who may have previously been excluded from the field due to the time and resources required to develop these models.
+
+We are excited about the potential impact of our work on automatic differentiation and look forward to seeing the ways in which it may benefit the broader world.
 
 ### Inclusivity Statement
 
