@@ -283,6 +283,48 @@ The `node.py` module is the backbone of our implementation. This is where we hav
 
 Another important module is `elementaries.py` which provides convenient commonly used mathematical functions such as `sin`, `cos`, `tan`, etc. These functions behave similarly to numpy's implementation of these functions. More specifically our implementations act as wrapper functions that make instances of class `Node` compatible with numpy's commonly used functions. In our implementation of `sin`, `cos`, etc, each function call returns a new instance of class node. Once again, this allows our users to chain expressions of nodes to calculate forward and primal traces of their functions.
 
+## Extension
+
+For our extension, we implemented a node registry to store unique nodes that the package can later referance instead of repeating potentially expensive computations. Importantly, there is a cost associated with our registry: the lookup. In essence, we replace much of the node computation cost with the node lookup cost. Consider the following function on a given node, $x$:
+
+$$
+g(x) = f(x) + f^2(x) + \dots + f^n(x) = \sum_{i=1}^nf^i(x)
+$$
+
+where the superscript notation indicates iterative function calls ($f^2(x) = f(f(x))$). When computed without a registry, $g(x)$ requires $\sum_{i=1}^ni$ computations; with a registry, $g(x)$ requires $n$ computations (one for each term in $g$ -- subsequent terms need only apply $f$ once more to the previous term) and $\sum_{i=1}^ni$ registry checks (if we include failed checks for new nodes). Let $t_c$ be the computation time for $f$ and $t_r$ be the lookup time for the node registry. We can formalize the registry trade-off:
+
+$$
+t_c\sum_{i=1}^ni = t_cn + t_r\sum_{i=1}^ni
+$$
+
+We now solve for the ratio of the computation times for better interpretation. 
+
+$$
+\frac{t_c}{t_r} = \frac{\sum_{i=1}^ni}{\sum_{i=1}^{n-1}i}
+$$
+
+For a given $t_c$, $t_r$, and $n$; the registry reduces time complexity if and only if:
+
+$$
+\frac{t_c}{t_r} > \frac{\sum_{i=1}^ni}{\sum_{i=1}^{n-1}i}
+$$
+
+Now consider $f(x) = \sqrt{x}$. Square root is a relatively expensive computation, and so $\frac{t_c}{t_r}$ is relatively large while look-up time remains constant. Belwo we plot the difference in autodiff time between registry and no-registry for this function We observe an exponential increase in time without the registry. 
+
+![benchmark_results](benchmark_results.png)
+
+If the wishes to disable the registry for a function with simple, unique computations, they can do so via the `set_overwrite_mode` method of the `Node` class.
+
+## Broader Impact and Inclusivity Statement
+
+### Broader Impact
+
+TODO
+
+### Inclusivity Statement
+
+TODO
+
 ## Future Features
 
 The current implementation only support forward mode AD. We plan to implement support for reverse mode in the near future (see the background section above for details on forward and reverse mode AD). We would like our package to be efficient for functions of many inputs such as large neural networks; reverse mode AD is much more efficient than forward mode as the ratio of input dimension to output dimension grows. 

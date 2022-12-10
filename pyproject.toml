@@ -21,3 +21,11 @@ dependencies =["numpy"]
 
 [tool.setuptools]
 packages = ["autodiff_team29"]
+
+[project.optional-dependencies]
+
+test = [
+    "pytest",
+    "pytest-cov",
+    "expects"
+]

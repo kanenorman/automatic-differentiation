@@ -4,28 +4,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from autodiff_team29 import Node
+from autodiff_team29.elementaries import sin, exp, cos, sqrt
 
 
 def compute_expensive_duplicate_product_of_nodes(n_nodes: int):
     """
     Emulates the execution of the product of n numbers.
     This product is duplicated to test our optimization performance.
-    For example, if we have a function (x1*x2*...*xn) + (x1*x2*...*xn).
-    Can we save time by avoiding recomputing the second set of nodes?
 
     """
 
-    # reset state of tracking
+    # reset environment
     Node.clear_node_registry()
     Node._NODES_COMPUTED_FOR_BENCHMARKING = 0
 
     # time expensive computation
     start = time.perf_counter()
-    np.sum([Node(str(n), n, 1) for n in np.linspace(1,n_nodes,n_nodes)])
-    np.sum([Node(str(n), n, 1) for n in np.linspace(1,n_nodes,n_nodes)])
-    np.sum([Node(str(n), n, 1) for n in np.linspace(1, n_nodes, n_nodes)])
-    np.sum([Node(str(n), n, 1) for n in np.linspace(1, n_nodes, n_nodes)])
-    np.sum([Node(str(n), n, 1) for n in np.linspace(1, n_nodes, n_nodes)])
+
+    x = Node("x", 123424341341544235, 1)
+
+    def apply_n_square_roots(n, x):
+
+        value = x
+        for _ in range(1, n + 1):
+            value = sqrt(value)
+
+        return value
+
+    sum([apply_n_square_roots(n, x) for n in range(n_nodes)])
+
     end = time.perf_counter()
     elapsed_time = end - start
 
@@ -53,7 +60,10 @@ def benchmark(number_of_inputs, sample_size, overwrite_setting):
 
         for sample_index in range(sample_size):
             # get results of expensive computation
-            number_nodes_created, elapsed_time = compute_expensive_duplicate_product_of_nodes(number)
+            (
+                number_nodes_created,
+                elapsed_time,
+            ) = compute_expensive_duplicate_product_of_nodes(number)
 
             sample_execution_times[sample_index] = elapsed_time
             sample_number_nodes_created[sample_index] = number_nodes_created
@@ -63,29 +73,28 @@ def benchmark(number_of_inputs, sample_size, overwrite_setting):
         std_sample_execution_time = np.std(sample_execution_times)
         average_nodes_created = np.average(sample_number_nodes_created)
 
-
         average_execution_times.append(average_sample_execution_time)
         standard_deviation_execution_times.append(std_sample_execution_time)
         nodes_created.append(average_nodes_created)
 
-
-    return np.array(average_execution_times), np.array(
-        standard_deviation_execution_times
-    ), np.array(nodes_created)
+    return (
+        np.array(average_execution_times),
+        np.array(standard_deviation_execution_times),
+        np.array(nodes_created),
+    )
 
 
 if __name__ == "__main__":
-    # number_of_inputs = (np.linspace(1, 70, 70) ** 2).astype(int)
-    number_of_inputs = (np.linspace(1, 500, 500)).astype(int)
-    sample_size = 50
 
-    figure, (axis_1, axis_2) = plt.subplots(1,2,figsize=(20,5))
+    number_of_inputs = (np.linspace(1, 100, 100)).astype(int)
+    sample_size = 30
+
+    figure, (axis_1, axis_2) = plt.subplots(1, 2, figsize=(20, 5))
 
     # overwrite Mode off
     avg_disabled_times, std_disabled_times, number_nodes_created_disabled = benchmark(
         number_of_inputs, sample_size, overwrite_setting=False
     )
-
 
     # average Execution Time
     axis_1.plot(
@@ -110,8 +119,6 @@ if __name__ == "__main__":
         linestyle="-.",
         label="Overwriting Disabled",
     )
-
-
 
     # average time for overwriting on
     avg_enabled_times, std_enabled_times, number_nodes_created_enabled = benchmark(
@@ -144,18 +151,17 @@ if __name__ == "__main__":
     # plot formatting
     axis_1.set_xlabel("n")
     axis_1.set_ylabel("Average Execution Time")
-    axis_1.set_title(
-        "Execution Time by Input Size"
-    )
+    axis_1.set_title("Execution Time")
 
     axis_2.set_xlabel("n")
     axis_2.set_ylabel("Number of Nodes Created")
-    axis_2.set_title(
-        "Nodes Created by Input Size"
+    axis_2.set_title("Nodes Created")
+
+    axis_2.set_yscale("log")
+
+    plt.suptitle(
+        r"$g(x) = f(x) + f(x)^2 +.......+ f^n(x) = \sum_{i=1}^{n}f^{i}(x)$ where $f(x)=\sqrt{x}$ for various $n$"
     )
-
-
-    plt.suptitle("$f(x_1,x_2,...x_n) = (\prod_{i=1}^{n}x_i)+(\prod_{i=1}^{n}x_i)$ for various $n$")
 
     plt.figtext(
         0.98,
@@ -170,4 +176,4 @@ if __name__ == "__main__":
     axis_2.legend()
 
     plt.tight_layout()
-    figure.show()
+    plt.savefig("benchmark_results.png")
