@@ -73,6 +73,38 @@ def _check_sqrt_domain_restrictions(x: Node) -> None:
     if x.value < 0:
         raise ValueError("Square roots of negative numbers not supported")
 
+def _check_tan_domain_restrictions(x: Node) -> None:
+    """
+    Checks if cosine of given value is zero and thus invalid for tangent. 
+
+    Parameters
+    ----------
+    x : Node
+        An instance of the Node class, where x.value is the numeric value of the node and
+        x.deriative is the derivative of the node.
+
+    Returns
+    -------
+    None
+        if cos(x) != 0
+
+    Raises
+    ------
+    ValueError
+        if cos(x) == 0.
+
+    Examples
+    --------
+    >>> _check_tan_domain_restrictions(Node("1",1,0))
+    None
+    >>> _check_tan_domain_restrictions(Node("0",0,0))
+    None
+    >>> _check_tan_domain_restrictions(Node("pi",np.pi/2,0))
+    ValueError: Value, pi/2, not within domain of tan
+
+    """
+    if np.cos(x.value) == 0:
+        raise ValueError(f"Value, {x.value}, not within domain of tan")
 
 def _check_arccos_domain_restrictions(x: Node) -> None:
     """
@@ -463,6 +495,8 @@ def tan(x: Union[int, float, Node]) -> Node:
 
     x = Node._convert_numeric_type_to_node(x)
 
+    _check_tan_domain_restrictions(x)
+
     forward_trace = np.tan(x.value)
     tangent_trace = x.derivative / (np.cos(x.value) ** 2)
     new_node = Node(
@@ -508,6 +542,8 @@ def arcsin(x: Union[int, float, Node]) -> Node:
 
     x = Node._convert_numeric_type_to_node(x)
 
+    _check_arcsin_domain_restrictions(x)
+
     forward_trace = np.arcsin(x.value)
     tangent_trace = x.derivative / np.sqrt(1 - x.value**2)
     new_node = Node(
@@ -552,6 +588,8 @@ def arccos(x: Union[int, float, Node]) -> Node:
         return Node._get_existing_node(symbolic_representation)
 
     x = Node._convert_numeric_type_to_node(x)
+
+    _check_arccos_domain_restrictions(x)
 
     forward_trace = np.arccos(x.value)
     tangent_trace = -x.derivative / np.sqrt(1 - x.value**2)
