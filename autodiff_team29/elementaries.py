@@ -171,26 +171,26 @@ def _check_arcsin_domain_restrictions(x: Node) -> None:
 
 def sqrt(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based of the square
-     root of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based of the square
+    root of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> sqrt(Node("1",1,0))
-     Node("sqrt(1)", 1, 0)
-     >>> sqrt(Node("0",0,0))
-     Node("sqrt(0)", 0, 0)
-     >>> sqrt(Node("-1",-1,0))
-     ValueError: Square roots of negative numbers not supported
+    Examples
+    --------
+    >>> sqrt(Node("1",1,0))
+    Node("sqrt(1)", 1, 0)
+    >>> sqrt(Node("0",0,0))
+    Node("sqrt(0)", 0, 0)
+    >>> sqrt(Node("-1",-1,0))
+    ValueError: Square roots of negative numbers not supported
 
     """
     symbolic_representation = "sqrt({})".format(str(x))
@@ -210,26 +210,26 @@ def sqrt(x: Union[int, float, Node]) -> Node:
 
 def ln(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the natural log
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the natural log
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> ln(Node("1",1,0))
-     Node("ln(1)", 0, 1)
-     >>> ln(Node("0",0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     >>> ln(-1)
-     ValueError: Value '-1' not valid for a logarithmic functionNone
+    Examples
+    --------
+    >>> ln(Node("1",1,0))
+    Node("ln(1)", 0, 1)
+    >>> ln(Node("0",0,0))
+    ValueError: Value 0 not valid for a logarithmic function
+    >>> ln(-1)
+    ValueError: Value '-1' not valid for a logarithmic functionNone
 
     """
     symbolic_representation = "ln({})".format(str(x))
@@ -247,33 +247,33 @@ def ln(x: Union[int, float, Node]) -> Node:
     return new_node
 
 
-def log(x, base=np.e):
+def log(x: Union[int, float, Node], base: Union[int, float, Node] = np.e) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the logarithm
-     of the input node x and the provided base.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the logarithm
+    of the input node x and the provided base.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     base : Union[int, float]
+    base : Union[int, float]
         The desired base of the logorithm. Must be an integer or float greater than 1.
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> log(Node("1",1,0), 10)
-     Node("log10(1)", 0, 0.4343)
-     >>> log(Node("1",1,0), 2)
-     Node("log2(1)", 0, 1.4427)
-     >>> log(Node("0",0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     >>> log(Node("-1",-1,0))
-     ValueError: Value -1 not valid for a logarithmic function
+    Examples
+    --------
+    >>> log(Node("1",1,0), 10)
+    Node("log10(1)", 0, 0.4343)
+    >>> log(Node("1",1,0), 2)
+    Node("log2(1)", 0, 1.4427)
+    >>> log(Node("0",0,0))
+    ValueError: Value 0 not valid for a logarithmic function
+    >>> log(Node("-1",-1,0))
+    ValueError: Value -1 not valid for a logarithmic function
 
     """
     if not base > 1:
@@ -296,26 +296,26 @@ def log(x, base=np.e):
 
 def exp(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the exponential
-     value of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the exponential
+    value of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> exp(Node("1",1,0))
-     Node("exp(1)", 2.7183, 0)
-     >>> exp(Node("0",0,0))
-     Node("exp(0)", 1, 0)
-     >>> exp(Node("-1",-1,0))
-     Node("exp(-1)", 0.3679, 0)
+    Examples
+    --------
+    >>> exp(Node("1",1,0))
+    Node("exp(1)", 2.7183, 0)
+    >>> exp(Node("0",0,0))
+    Node("exp(0)", 1, 0)
+    >>> exp(Node("-1",-1,0))
+    Node("exp(-1)", 0.3679, 0)
 
     """
     symbolic_representation = "exp({})".format(str(x))
@@ -333,26 +333,26 @@ def exp(x: Union[int, float, Node]) -> Node:
 
 def sin(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the sine
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sine
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> sin(Node("1",1,0))
-     Node("sin(1)", 0.8415, 0)
-     >>> sin(Node("0",0,0))
-     Node("sin(0)", 0, 0)
-     >>> sin(Node("-1",-1,0))
-     Node("sin(-1)", -0.8415, 0)
+    Examples
+    --------
+    >>> sin(Node("1",1,0))
+    Node("sin(1)", 0.8415, 0)
+    >>> sin(Node("0",0,0))
+    Node("sin(0)", 0, 0)
+    >>> sin(Node("-1",-1,0))
+    Node("sin(-1)", -0.8415, 0)
 
     """
     symbolic_representation = "sin({})".format(str(x))
@@ -370,26 +370,26 @@ def sin(x: Union[int, float, Node]) -> Node:
 
 def cos(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the cosine
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the cosine
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> cos(Node("1",1,0))
-     Node("cos(1)", 0.5403, 0)
-     >>> cos(Node("0",1,0))
-     Node("cos(0)", 1, 0)
-     >>> cos(Node("-1",-1,0))
-     Node("cos(-1)", -0.5403, 0)
+    Examples
+    --------
+    >>> cos(Node("1",1,0))
+    Node("cos(1)", 0.5403, 0)
+    >>> cos(Node("0",1,0))
+    Node("cos(0)", 1, 0)
+    >>> cos(Node("-1",-1,0))
+    Node("cos(-1)", -0.5403, 0)
 
     """
     symbolic_representation = "cos({})".format(str(x))
@@ -407,26 +407,26 @@ def cos(x: Union[int, float, Node]) -> Node:
 
 def tan(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the tangent
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the tangent
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> tan(Node("1",1,0))
-     Node("tan(1)", 1.557, 0)
-     >>> tan(Node("0",0,0))
-     Node("tan(0)", 0, 0)
-     >>> tan(Node("-1",-1,0))
-     Node("tan(-1)", -1.557, 0)
+    Examples
+    --------
+    >>> tan(Node("1",1,0))
+    Node("tan(1)", 1.557, 0)
+    >>> tan(Node("0",0,0))
+    Node("tan(0)", 0, 0)
+    >>> tan(Node("-1",-1,0))
+    Node("tan(-1)", -1.557, 0)
 
     """
     symbolic_representation = "tan({})".format(str(x))
@@ -446,26 +446,26 @@ def tan(x: Union[int, float, Node]) -> Node:
 
 def arcsin(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the arcsin
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the arcsin
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> arcsin(Node("1",1,0))
-     Node("arcsin(1)", 1.5708, 0)
-     >>> arcsin(Node("0",0,0))
-     Node("arcsin(0)", 0, 0)
-     >>> arcsin(Node("-1",-1,0))
-     Node("arcsin(-1)", -1.5708, 0)
+    Examples
+    --------
+    >>> arcsin(Node("1",1,0))
+    Node("arcsin(1)", 1.5708, 0)
+    >>> arcsin(Node("0",0,0))
+    Node("arcsin(0)", 0, 0)
+    >>> arcsin(Node("-1",-1,0))
+    Node("arcsin(-1)", -1.5708, 0)
 
     """
     symbolic_representation = "arcsin({})".format(str(x))
@@ -477,7 +477,7 @@ def arcsin(x: Union[int, float, Node]) -> Node:
     _check_arcsin_domain_restrictions(x)
 
     forward_trace = np.arcsin(x.value)
-    tangent_trace = x.derivative / np.sqrt(1 - x.value**2)
+    tangent_trace = x.derivative / np.sqrt(1 - x.value ** 2)
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
 
     return new_node
@@ -516,7 +516,7 @@ def arccos(x: Union[int, float, Node]) -> Node:
     _check_arccos_domain_restrictions(x)
 
     forward_trace = np.arccos(x.value)
-    tangent_trace = -x.derivative / np.sqrt(1 - x.value**2)
+    tangent_trace = -x.derivative / np.sqrt(1 - x.value ** 2)
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
 
     return new_node
@@ -524,26 +524,26 @@ def arccos(x: Union[int, float, Node]) -> Node:
 
 def arctan(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the arctan
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the arctan
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> arctan(Node("1",1,0))
-     Node("arctan(1)", 0.7854, 0)
-     >>> arctan(Node("0",0,0))
-     Node("arctan(0)", 0, 0)
-     >>> arctan(Node("-1",-1,0))
-     Node("arctan(-1)", -0.7854, 0)
+    Examples
+    --------
+    >>> arctan(Node("1",1,0))
+    Node("arctan(1)", 0.7854, 0)
+    >>> arctan(Node("0",0,0))
+    Node("arctan(0)", 0, 0)
+    >>> arctan(Node("-1",-1,0))
+    Node("arctan(-1)", -0.7854, 0)
 
     """
     symbolic_representation = "arctan({})".format(str(x))
@@ -553,7 +553,7 @@ def arctan(x: Union[int, float, Node]) -> Node:
     x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.arctan(x.value)
-    tangent_trace = x.derivative / (1 + x.value**2)
+    tangent_trace = x.derivative / (1 + x.value ** 2)
     new_node = Node(
         symbolic_representation,
         forward_trace,
@@ -565,23 +565,23 @@ def arctan(x: Union[int, float, Node]) -> Node:
 
 def power(base: Union[int, float, Node], exponent: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the power
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the power
+    of the input node x.
 
     Parameters
-     ----------
-     base : Union[int, float, Node]
-     exponent : Union[int, float, Node]
+    ----------
+    base : Union[int, float, Node]
+    exponent : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> power(3,2)
-     Node("3**2", 9, 0)
+    Examples
+    --------
+    >>> power(3,2)
+    Node("3**2", 9, 0)
 
     """
     symbolic_representation = f"({base}**{exponent})"
@@ -590,28 +590,28 @@ def power(base: Union[int, float, Node], exponent: Union[int, float, Node]) -> N
 
     base = Node._convert_numeric_type_to_node(base)
 
-    return base**exponent
+    return base ** exponent
 
 
 def sinh(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the sinh
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sinh
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
 
-     Examples
-     --------
-     >>> sinh(1)
-     Node("sinh(1)", 1.1752011936438014, 0)
+    Examples
+    --------
+    >>> sinh(1)
+    Node("sinh(1)", 1.1752011936438014, 0)
 
     """
     symbolic_representation = f"sinh({x})"
@@ -629,22 +629,22 @@ def sinh(x: Union[int, float, Node]) -> Node:
 
 def cosh(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the sinh
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sinh
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> cosh(1)
-     Node("cosh(1)", 1.5430806348152437, 0)
+    Examples
+    --------
+    >>> cosh(1)
+    Node("cosh(1)", 1.5430806348152437, 0)
 
     """
     symbolic_representation = f"cosh({x})"
@@ -662,23 +662,23 @@ def cosh(x: Union[int, float, Node]) -> Node:
 
 def tanh(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
 
-     Examples
-     --------
-     >>> sinh(1)
-     Node("sinh(1)", 1.1752011936438014, 0)
+    Examples
+    --------
+    >>> tanh(1)
+    Node("tanh(1)", 0.76159415595, 0)
 
     """
     symbolic_representation = f"tanh({x})"
@@ -696,22 +696,22 @@ def tanh(x: Union[int, float, Node]) -> Node:
 
 def logistic(x: Union[int, float, Node]) -> Node:
     """
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     >>> logistic(1)
-     Node("logistic(1)", 1.1752011936438014, 0)
+    Examples
+    --------
+    >>> logistic(1)
+    Node("logistic(1)", 1.1752011936438014, 0)
 
     """
     symbolic_representation = f"logistic({x})"
@@ -722,9 +722,9 @@ def logistic(x: Union[int, float, Node]) -> Node:
 
     forward_trace = np.exp(-np.logaddexp(0, -x.value))
     tangent_trace = (
-        (np.exp(-np.logaddexp(0, -x.value)))
-        * (1 - np.exp(-np.logaddexp(0, -x.value)))
-        * x.derivative
+            (np.exp(-np.logaddexp(0, -x.value)))
+            * (1 - np.exp(-np.logaddexp(0, -x.value)))
+            * x.derivative
     )
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
 

@@ -254,9 +254,10 @@ class Node:
         Node._NODE_REGISTRY[node._symbol] = node
 
     @classmethod
-    def count_nodes_stored(cls):
+    def count_nodes_stored(cls) -> int:
         """
-        Returns the number of nodes stored in the registry
+        Returns the number of nodes currently stored in the registry.
+
         """
         return len(Node._NODE_REGISTRY)
 
@@ -265,8 +266,7 @@ class Node:
     def set_overwrite_mode(cls, enabled: bool) -> None:
         """
         Allows existing nodes to be recomputed.
-        Turning on override mode will
-        Be warned, this will result in a performance decrease!
+        Be warned, this can result in a significant performance decrease!
 
         Parameters
         ---------
@@ -303,15 +303,13 @@ class Node:
         # set the overwrite mode to what the user specified
         cls._OVERWRITE_MODE = enabled
 
-        # # for benchmarking extension, when mode is switched be sure to restart the count
-        # Node._NODES_COMPUTED_FOR_BENCHMARKING = 0
-
 
     @staticmethod
     def clear_node_registry() -> None:
         """
-        Removes all key value pairs from the node registry.
-        Will Erase ALL previous computations made by the graph.
+        Removes all key value pairs currently stored the node registry.
+        WARNING previous computations made by the graph will be permanently erased.
+
         """
         Node._NODE_REGISTRY.clear()
 

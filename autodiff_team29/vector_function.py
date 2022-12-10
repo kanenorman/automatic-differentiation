@@ -28,7 +28,7 @@ class VectorFunction:
         An instantiation would be
         >>> x = Node("x", 2, 1 ,seed_vector=[1,0])
         >>> y = Node("y", 3, 1, seed_vector=[0,1])
-        >>> f = VectorFunction([x + y, x - 2*y])
+        >>> f = VectorFunction([x + y, x - 2 * y])
 
         """
 

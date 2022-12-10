@@ -27,9 +27,8 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from typing import Union
-
 import numpy as np
-
+import math
 from autodiff_team29 import Node
 
 
@@ -41,8 +40,6 @@ def _check_log_domain_restrictions(x: Node) -&gt; None:
     Parameters
     ----------
     x: Node
-        An instance of the node class, where x.value is the numeric value of the node and
-        x.deriative is the derivative of the node.
 
     Returns
     -------
@@ -76,8 +73,6 @@ def _check_sqrt_domain_restrictions(x: Node) -&gt; None:
     Parameters
     ----------
     x : Node
-        An instance of the Node class, where x.value is the numeric value of the node and
-        x.deriative is the derivative of the node.
 
     Returns
     -------
@@ -103,6 +98,38 @@ def _check_sqrt_domain_restrictions(x: Node) -&gt; None:
         raise ValueError(&#34;Square roots of negative numbers not supported&#34;)
 
 
+def _check_tan_domain_restrictions(x: Node) -&gt; None:
+    &#34;&#34;&#34;
+    Checks if cosine of given value is zero and thus invalid for tangent.
+
+    Parameters
+    ----------
+    x : Node
+
+    Returns
+    -------
+    None
+        if cos(x) != 0
+
+    Raises
+    ------
+    ValueError
+        if cos(x) == 0.
+
+    Examples
+    --------
+    &gt;&gt;&gt; _check_tan_domain_restrictions(Node(&#34;1&#34;,1,0))
+    None
+    &gt;&gt;&gt; _check_tan_domain_restrictions(Node(&#34;0&#34;,0,0))
+    None
+    &gt;&gt;&gt; _check_tan_domain_restrictions(Node(&#34;pi&#34;,np.pi/2,0))
+    ValueError: Value, pi/2, not within domain of tan
+
+    &#34;&#34;&#34;
+    if np.cos(x.value) == 0:
+        raise ValueError(f&#34;Value, {x.value}, not within domain of tan&#34;)
+
+
 def _check_arccos_domain_restrictions(x: Node) -&gt; None:
     &#34;&#34;&#34;
     Checks if the value of a given input x is not -1 ≤ x ≤ 1 therefore
@@ -111,8 +138,6 @@ def _check_arccos_domain_restrictions(x: Node) -&gt; None:
     Parameters
     ----------
     x : Node
-        An instance of the Node class, where x.value is the numeric value of the node and
-        x.deriative is the derivative of the node.
 
     Returns
     -------
@@ -148,8 +173,6 @@ def _check_arcsin_domain_restrictions(x: Node) -&gt; None:
     Parameters
     ----------
     x : Node
-        An instance of the Node class, where x.value is the numeric value of the node and
-        x.deriative is the derivative of the node.
 
     Returns
     -------
@@ -176,412 +199,315 @@ def _check_arcsin_domain_restrictions(x: Node) -&gt; None:
 
 def sqrt(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based of the square
-     root of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based of the square
+    root of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;sqrt({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; sqrt(Node(&#34;1&#34;,1,0))
-     Node(&#34;sqrt(1)&#34;, 1, 0)
-     &gt;&gt;&gt; sqrt(Node(&#34;0&#34;,0,0))
-     Node(&#34;sqrt(0)&#34;, 0, 0)
-     &gt;&gt;&gt; sqrt(Node(&#34;-1&#34;,-1,0))
-     ValueError: Square roots of negative numbers not supported
+    Examples
+    --------
+    &gt;&gt;&gt; sqrt(Node(&#34;1&#34;,1,0))
+    Node(&#34;sqrt(1)&#34;, 1, 0)
+    &gt;&gt;&gt; sqrt(Node(&#34;0&#34;,0,0))
+    Node(&#34;sqrt(0)&#34;, 0, 0)
+    &gt;&gt;&gt; sqrt(Node(&#34;-1&#34;,-1,0))
+    ValueError: Square roots of negative numbers not supported
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;sqrt({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_sqrt_domain_restrictions(x)
 
     forward_trace = np.sqrt(x.value)
     tangent_trace = x.derivative / (2 * np.sqrt(x.value))
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
-    Node._insert_node_to_registry(new_node)
+
     return new_node
 
 
 def ln(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the natural log
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the natural log
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;ln({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; ln(Node(&#34;1&#34;,1,0))
-     Node(&#34;ln(1)&#34;, 0, 1)
-     &gt;&gt;&gt; ln(Node(&#34;0&#34;,0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     &gt;&gt;&gt; ln(-1)
-     ValueError: Value &#39;-1&#39; not valid for a logarithmic functionNone
+    Examples
+    --------
+    &gt;&gt;&gt; ln(Node(&#34;1&#34;,1,0))
+    Node(&#34;ln(1)&#34;, 0, 1)
+    &gt;&gt;&gt; ln(Node(&#34;0&#34;,0,0))
+    ValueError: Value 0 not valid for a logarithmic function
+    &gt;&gt;&gt; ln(-1)
+    ValueError: Value &#39;-1&#39; not valid for a logarithmic functionNone
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;ln({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_log_domain_restrictions(x)
 
     forward_trace = np.log(x.value)
     tangent_trace = 1 / x.value
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
-def log10(x: Union[int, float, Node]) -&gt; Node:
+def log(x: Union[int, float, Node], base: Union[int, float, Node] = np.e) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the base 10
-     logarithm of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the logarithm
+    of the input node x and the provided base.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;log10({})&#34;, its forward trace, and
-         tangent trace.
+    base : Union[int, float]
+        The desired base of the logorithm. Must be an integer or float greater than 1.
 
-     Examples
-     --------
-     &gt;&gt;&gt; log10(Node(&#34;1&#34;,1,0))
-     Node(&#34;log10(1)&#34;, 0, 0.4343)
-     &gt;&gt;&gt; log10(Node(&#34;0&#34;,0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     &gt;&gt;&gt; log10(Node(&#34;-1&#34;,-1,0))
-     ValueError: Value -1 not valid for a logarithmic function
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; log(Node(&#34;1&#34;,1,0), 10)
+    Node(&#34;log10(1)&#34;, 0, 0.4343)
+    &gt;&gt;&gt; log(Node(&#34;1&#34;,1,0), 2)
+    Node(&#34;log2(1)&#34;, 0, 1.4427)
+    &gt;&gt;&gt; log(Node(&#34;0&#34;,0,0))
+    ValueError: Value 0 not valid for a logarithmic function
+    &gt;&gt;&gt; log(Node(&#34;-1&#34;,-1,0))
+    ValueError: Value -1 not valid for a logarithmic function
 
     &#34;&#34;&#34;
-    symbolic_representation = &#34;log10({})&#34;.format(str(x))
+    if not base &gt; 1:
+        raise ValueError(&#34;Base must be greater than 1&#34;)
+
+    symbolic_representation = f&#34;log{str(base)}({str(x)})&#34;
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_log_domain_restrictions(x)
 
-    forward_trace = np.log10(x.value)
-    tangent_trace = 1 / (x.value * np.log(10))
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
-    return new_node
+    forward_trace = math.log(x.value, base)
+    tangent_trace = 1 / (x.value * np.log(base))
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
 
-
-def log2(x: Union[int, float, Node]) -&gt; Node:
-    &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the base 2
-     logarithm of the input node x.
-
-    Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
-
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;log2({})&#34;, its forward trace, and
-         tangent trace.
-
-     Examples
-     --------
-     &gt;&gt;&gt; log2(Node(&#34;1&#34;,1,0))
-     Node(&#34;log2(1)&#34;, 0, 1.4427)
-     &gt;&gt;&gt; log2(Node(&#34;0&#34;,0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     &gt;&gt;&gt; log2(Node(&#34;-1&#34;,-1,0))
-     ValueError: Value &#39;-1&#39; not valid for a logarithmic function
-
-    &#34;&#34;&#34;
-    symbolic_representation = &#34;log2({})&#34;.format(str(x))
-    if Node._check_node_exists(symbolic_representation):
-        return Node._get_existing_node(symbolic_representation)
-
-    x = Node.convert_to_node(x)
-
-    _check_log_domain_restrictions(x)
-
-    forward_trace = np.log2(x.value)
-    tangent_trace = 1 / (x.value * np.log(2))
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
     return new_node
 
 
 def exp(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the exponential
-     value of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the exponential
+    value of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;exp({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; exp(Node(&#34;1&#34;,1,0))
-     Node(&#34;exp(1)&#34;, 2.7183, 0)
-     &gt;&gt;&gt; exp(Node(&#34;0&#34;,0,0))
-     Node(&#34;exp(0)&#34;, 1, 0)
-     &gt;&gt;&gt; exp(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;exp(-1)&#34;, 0.3679, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; exp(Node(&#34;1&#34;,1,0))
+    Node(&#34;exp(1)&#34;, 2.7183, 0)
+    &gt;&gt;&gt; exp(Node(&#34;0&#34;,0,0))
+    Node(&#34;exp(0)&#34;, 1, 0)
+    &gt;&gt;&gt; exp(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;exp(-1)&#34;, 0.3679, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;exp({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.exp(x.value)
     tangent_trace = x.derivative * forward_trace
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
 def sin(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the sine
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sine
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;sin({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; sin(Node(&#34;1&#34;,1,0))
-     Node(&#34;sin(1)&#34;, 0.8415, 0)
-     &gt;&gt;&gt; sin(Node(&#34;0&#34;,0,0))
-     Node(&#34;sin(0)&#34;, 0, 0)
-     &gt;&gt;&gt; sin(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;sin(-1)&#34;, -0.8415, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; sin(Node(&#34;1&#34;,1,0))
+    Node(&#34;sin(1)&#34;, 0.8415, 0)
+    &gt;&gt;&gt; sin(Node(&#34;0&#34;,0,0))
+    Node(&#34;sin(0)&#34;, 0, 0)
+    &gt;&gt;&gt; sin(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;sin(-1)&#34;, -0.8415, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;sin({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.sin(x.value)
     tangent_trace = np.cos(x.value) * x.derivative
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
 def cos(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the cosine
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the cosine
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;cos({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; cos(Node(&#34;1&#34;,1,0))
-     Node(&#34;cos(1)&#34;, 0.5403, 0)
-     &gt;&gt;&gt; cos(Node(&#34;0&#34;,1,0))
-     Node(&#34;cos(0)&#34;, 1, 0)
-     &gt;&gt;&gt; cos(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;cos(-1)&#34;, -0.5403, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; cos(Node(&#34;1&#34;,1,0))
+    Node(&#34;cos(1)&#34;, 0.5403, 0)
+    &gt;&gt;&gt; cos(Node(&#34;0&#34;,1,0))
+    Node(&#34;cos(0)&#34;, 1, 0)
+    &gt;&gt;&gt; cos(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;cos(-1)&#34;, -0.5403, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;cos({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.cos(x.value)
     tangent_trace = -np.sin(x.value) * x.derivative
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
 def tan(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the tangent
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the tangent
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;tan({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; tan(Node(&#34;1&#34;,1,0))
-     Node(&#34;tan(1)&#34;, 1.557, 0)
-     &gt;&gt;&gt; tan(Node(&#34;0&#34;,0,0))
-     Node(&#34;tan(0)&#34;, 0, 0)
-     &gt;&gt;&gt; tan(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;tan(-1)&#34;, -1.557, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; tan(Node(&#34;1&#34;,1,0))
+    Node(&#34;tan(1)&#34;, 1.557, 0)
+    &gt;&gt;&gt; tan(Node(&#34;0&#34;,0,0))
+    Node(&#34;tan(0)&#34;, 0, 0)
+    &gt;&gt;&gt; tan(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;tan(-1)&#34;, -1.557, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;tan({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
+
+    _check_tan_domain_restrictions(x)
 
     forward_trace = np.tan(x.value)
     tangent_trace = x.derivative / (np.cos(x.value) ** 2)
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
 def arcsin(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the arcsin
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the arcsin
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;arcsin({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; arcsin(Node(&#34;1&#34;,1,0))
-     Node(&#34;arcsin(1)&#34;, 1.5708, 0)
-     &gt;&gt;&gt; arcsin(Node(&#34;0&#34;,0,0))
-     Node(&#34;arcsin(0)&#34;, 0, 0)
-     &gt;&gt;&gt; arcsin(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;arcsin(-1)&#34;, -1.5708, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; arcsin(Node(&#34;1&#34;,1,0))
+    Node(&#34;arcsin(1)&#34;, 1.5708, 0)
+    &gt;&gt;&gt; arcsin(Node(&#34;0&#34;,0,0))
+    Node(&#34;arcsin(0)&#34;, 0, 0)
+    &gt;&gt;&gt; arcsin(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;arcsin(-1)&#34;, -1.5708, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;arcsin({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
+
+    _check_arcsin_domain_restrictions(x)
 
     forward_trace = np.arcsin(x.value)
-    tangent_trace = x.derivative / np.sqrt(1 - x.value**2)
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    tangent_trace = x.derivative / np.sqrt(1 - x.value ** 2)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
@@ -594,16 +520,10 @@ def arccos(x: Union[int, float, Node]) -&gt; Node:
     Parameters
     ----------
     x : Union[int, float, Node]
-        An instance of the Node class, where x.value is the numeric value of the node and
-        x.deriative is the derivative of the node.
 
     Returns
     -------
     Node
-        If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-        Else, returns new_node, which is a new instance of the Node class and contains three
-        inputs: the symbolic representation of the node &#34;arccos({})&#34;, its forward trace, and
-        tangent trace.
 
     Examples
     --------
@@ -619,59 +539,223 @@ def arccos(x: Union[int, float, Node]) -&gt; Node:
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
+
+    _check_arccos_domain_restrictions(x)
 
     forward_trace = np.arccos(x.value)
-    tangent_trace = -x.derivative / np.sqrt(1 - x.value**2)
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    tangent_trace = -x.derivative / np.sqrt(1 - x.value ** 2)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node
 
 
 def arctan(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the arctan
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the arctan
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;arcrtan({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; arctan(Node(&#34;1&#34;,1,0))
-     Node(&#34;arctan(1)&#34;, 0.7854, 0)
-     &gt;&gt;&gt; arctan(Node(&#34;0&#34;,0,0))
-     Node(&#34;arctan(0)&#34;, 0, 0)
-     &gt;&gt;&gt; arctan(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;arctan(-1)&#34;, -0.7854, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; arctan(Node(&#34;1&#34;,1,0))
+    Node(&#34;arctan(1)&#34;, 0.7854, 0)
+    &gt;&gt;&gt; arctan(Node(&#34;0&#34;,0,0))
+    Node(&#34;arctan(0)&#34;, 0, 0)
+    &gt;&gt;&gt; arctan(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;arctan(-1)&#34;, -0.7854, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;arctan({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.arctan(x.value)
-    tangent_trace = x.derivative / (1 + x.value**2)
+    tangent_trace = x.derivative / (1 + x.value ** 2)
     new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
+        symbolic_representation,
+        forward_trace,
+        tangent_trace,
     )
-    Node._insert_node_to_registry(new_node)
+
+    return new_node
+
+
+def power(base: Union[int, float, Node], exponent: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the power
+    of the input node x.
+
+    Parameters
+    ----------
+    base : Union[int, float, Node]
+    exponent : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; power(3,2)
+    Node(&#34;3**2&#34;, 9, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;({base}**{exponent})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    base = Node._convert_numeric_type_to_node(base)
+
+    return base ** exponent
+
+
+def sinh(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sinh
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+
+    Examples
+    --------
+    &gt;&gt;&gt; sinh(1)
+    Node(&#34;sinh(1)&#34;, 1.1752011936438014, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;sinh({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.sinh(x.value)
+    tangent_trace = np.cosh(x.value) * x.derivative
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
+    return new_node
+
+
+def cosh(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sinh
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; cosh(1)
+    Node(&#34;cosh(1)&#34;, 1.5430806348152437, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;cosh({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.cosh(x.value)
+    tangent_trace = np.sinh(x.value) * x.derivative
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
+    return new_node
+
+
+def tanh(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+
+    Examples
+    --------
+    &gt;&gt;&gt; tanh(1)
+    Node(&#34;tanh(1)&#34;, 0.76159415595, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;tanh({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.tanh(x.value)
+    tangent_trace = (1 - np.tanh(x.value) ** 2) * x.derivative
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
+    return new_node
+
+
+def logistic(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; logistic(1)
+    Node(&#34;logistic(1)&#34;, 1.1752011936438014, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;logistic({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.exp(-np.logaddexp(0, -x.value))
+    tangent_trace = (
+            (np.exp(-np.logaddexp(0, -x.value)))
+            * (1 - np.exp(-np.logaddexp(0, -x.value)))
+            * x.derivative
+    )
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </section>
@@ -692,16 +776,12 @@ of the input node x.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
-<dd>An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</dd>
+<dd>&nbsp;</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>Node</code></dt>
-<dd>If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "arccos({})", its forward trace, and
-tangent trace.</dd>
+<dd>&nbsp;</dd>
 </dl>
 <h2 id="examples">Examples</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; arccos(Node(&quot;1&quot;,1,0))
@@ -724,16 +804,10 @@ Node(&quot;arccos(-1)&quot;, -3.1416, 0)
     Parameters
     ----------
     x : Union[int, float, Node]
-        An instance of the Node class, where x.value is the numeric value of the node and
-        x.deriative is the derivative of the node.
 
     Returns
     -------
     Node
-        If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-        Else, returns new_node, which is a new instance of the Node class and contains three
-        inputs: the symbolic representation of the node &#34;arccos({})&#34;, its forward trace, and
-        tangent trace.
 
     Examples
     --------
@@ -749,14 +823,14 @@ Node(&quot;arccos(-1)&quot;, -3.1416, 0)
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
+
+    _check_arccos_domain_restrictions(x)
 
     forward_trace = np.arccos(x.value)
-    tangent_trace = -x.derivative / np.sqrt(1 - x.value**2)
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    tangent_trace = -x.derivative / np.sqrt(1 - x.value ** 2)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -767,78 +841,64 @@ Node(&quot;arccos(-1)&quot;, -3.1416, 0)
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the arcsin
 of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "arcsin({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>arcsin(Node("1",1,0))
-Node("arcsin(1)", 1.5708, 0)
-arcsin(Node("0",0,0))
-Node("arcsin(0)", 0, 0)
-arcsin(Node("-1",-1,0))
-Node("arcsin(-1)", -1.5708, 0)</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; arcsin(Node(&quot;1&quot;,1,0))
+Node(&quot;arcsin(1)&quot;, 1.5708, 0)
+&gt;&gt;&gt; arcsin(Node(&quot;0&quot;,0,0))
+Node(&quot;arcsin(0)&quot;, 0, 0)
+&gt;&gt;&gt; arcsin(Node(&quot;-1&quot;,-1,0))
+Node(&quot;arcsin(-1)&quot;, -1.5708, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def arcsin(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the arcsin
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the arcsin
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;arcsin({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; arcsin(Node(&#34;1&#34;,1,0))
-     Node(&#34;arcsin(1)&#34;, 1.5708, 0)
-     &gt;&gt;&gt; arcsin(Node(&#34;0&#34;,0,0))
-     Node(&#34;arcsin(0)&#34;, 0, 0)
-     &gt;&gt;&gt; arcsin(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;arcsin(-1)&#34;, -1.5708, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; arcsin(Node(&#34;1&#34;,1,0))
+    Node(&#34;arcsin(1)&#34;, 1.5708, 0)
+    &gt;&gt;&gt; arcsin(Node(&#34;0&#34;,0,0))
+    Node(&#34;arcsin(0)&#34;, 0, 0)
+    &gt;&gt;&gt; arcsin(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;arcsin(-1)&#34;, -1.5708, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;arcsin({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
+
+    _check_arcsin_domain_restrictions(x)
 
     forward_trace = np.arcsin(x.value)
-    tangent_trace = x.derivative / np.sqrt(1 - x.value**2)
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    tangent_trace = x.derivative / np.sqrt(1 - x.value ** 2)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -849,78 +909,66 @@ Node("arcsin(-1)", -1.5708, 0)</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the arctan
 of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "arcrtan({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>arctan(Node("1",1,0))
-Node("arctan(1)", 0.7854, 0)
-arctan(Node("0",0,0))
-Node("arctan(0)", 0, 0)
-arctan(Node("-1",-1,0))
-Node("arctan(-1)", -0.7854, 0)</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; arctan(Node(&quot;1&quot;,1,0))
+Node(&quot;arctan(1)&quot;, 0.7854, 0)
+&gt;&gt;&gt; arctan(Node(&quot;0&quot;,0,0))
+Node(&quot;arctan(0)&quot;, 0, 0)
+&gt;&gt;&gt; arctan(Node(&quot;-1&quot;,-1,0))
+Node(&quot;arctan(-1)&quot;, -0.7854, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def arctan(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the arctan
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the arctan
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;arcrtan({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; arctan(Node(&#34;1&#34;,1,0))
-     Node(&#34;arctan(1)&#34;, 0.7854, 0)
-     &gt;&gt;&gt; arctan(Node(&#34;0&#34;,0,0))
-     Node(&#34;arctan(0)&#34;, 0, 0)
-     &gt;&gt;&gt; arctan(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;arctan(-1)&#34;, -0.7854, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; arctan(Node(&#34;1&#34;,1,0))
+    Node(&#34;arctan(1)&#34;, 0.7854, 0)
+    &gt;&gt;&gt; arctan(Node(&#34;0&#34;,0,0))
+    Node(&#34;arctan(0)&#34;, 0, 0)
+    &gt;&gt;&gt; arctan(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;arctan(-1)&#34;, -0.7854, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;arctan({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.arctan(x.value)
-    tangent_trace = x.derivative / (1 + x.value**2)
+    tangent_trace = x.derivative / (1 + x.value ** 2)
     new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
+        symbolic_representation,
+        forward_trace,
+        tangent_trace,
     )
-    Node._insert_node_to_registry(new_node)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -931,78 +979,120 @@ Node("arctan(-1)", -0.7854, 0)</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the cosine
 of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "cos({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>cos(Node("1",1,0))
-Node("cos(1)", 0.5403, 0)
-cos(Node("0",1,0))
-Node("cos(0)", 1, 0)
-cos(Node("-1",-1,0))
-Node("cos(-1)", -0.5403, 0)</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; cos(Node(&quot;1&quot;,1,0))
+Node(&quot;cos(1)&quot;, 0.5403, 0)
+&gt;&gt;&gt; cos(Node(&quot;0&quot;,1,0))
+Node(&quot;cos(0)&quot;, 1, 0)
+&gt;&gt;&gt; cos(Node(&quot;-1&quot;,-1,0))
+Node(&quot;cos(-1)&quot;, -0.5403, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def cos(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the cosine
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the cosine
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;cos({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; cos(Node(&#34;1&#34;,1,0))
-     Node(&#34;cos(1)&#34;, 0.5403, 0)
-     &gt;&gt;&gt; cos(Node(&#34;0&#34;,1,0))
-     Node(&#34;cos(0)&#34;, 1, 0)
-     &gt;&gt;&gt; cos(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;cos(-1)&#34;, -0.5403, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; cos(Node(&#34;1&#34;,1,0))
+    Node(&#34;cos(1)&#34;, 0.5403, 0)
+    &gt;&gt;&gt; cos(Node(&#34;0&#34;,1,0))
+    Node(&#34;cos(0)&#34;, 1, 0)
+    &gt;&gt;&gt; cos(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;cos(-1)&#34;, -0.5403, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;cos({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.cos(x.value)
     tangent_trace = -np.sin(x.value) * x.derivative
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
+    return new_node</code></pre>
+</details>
+</dd>
+<dt id="autodiff_team29.elementaries.cosh"><code class="name flex">
+<span>def <span class="ident">cosh</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
+representation, forward trace, and tangent trace, which are based on the sinh
+of the input node x.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; cosh(1)
+Node(&quot;cosh(1)&quot;, 1.5430806348152437, 0)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cosh(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sinh
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; cosh(1)
+    Node(&#34;cosh(1)&#34;, 1.5430806348152437, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;cosh({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.cosh(x.value)
+    tangent_trace = np.sinh(x.value) * x.derivative
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -1013,78 +1103,62 @@ Node("cos(-1)", -0.5403, 0)</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the exponential
 value of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "exp({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>exp(Node("1",1,0))
-Node("exp(1)", 2.7183, 0)
-exp(Node("0",0,0))
-Node("exp(0)", 1, 0)
-exp(Node("-1",-1,0))
-Node("exp(-1)", 0.3679, 0)</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; exp(Node(&quot;1&quot;,1,0))
+Node(&quot;exp(1)&quot;, 2.7183, 0)
+&gt;&gt;&gt; exp(Node(&quot;0&quot;,0,0))
+Node(&quot;exp(0)&quot;, 1, 0)
+&gt;&gt;&gt; exp(Node(&quot;-1&quot;,-1,0))
+Node(&quot;exp(-1)&quot;, 0.3679, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def exp(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the exponential
-     value of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the exponential
+    value of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;exp({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; exp(Node(&#34;1&#34;,1,0))
-     Node(&#34;exp(1)&#34;, 2.7183, 0)
-     &gt;&gt;&gt; exp(Node(&#34;0&#34;,0,0))
-     Node(&#34;exp(0)&#34;, 1, 0)
-     &gt;&gt;&gt; exp(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;exp(-1)&#34;, 0.3679, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; exp(Node(&#34;1&#34;,1,0))
+    Node(&#34;exp(1)&#34;, 2.7183, 0)
+    &gt;&gt;&gt; exp(Node(&#34;0&#34;,0,0))
+    Node(&#34;exp(0)&#34;, 1, 0)
+    &gt;&gt;&gt; exp(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;exp(-1)&#34;, 0.3679, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;exp({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.exp(x.value)
     tangent_trace = x.derivative * forward_trace
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -1095,249 +1169,264 @@ Node("exp(-1)", 0.3679, 0)</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the natural log
 of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "ln({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>ln(Node("1",1,0))
-Node("ln(1)", 0, 1)
-ln(Node("0",0,0))
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; ln(Node(&quot;1&quot;,1,0))
+Node(&quot;ln(1)&quot;, 0, 1)
+&gt;&gt;&gt; ln(Node(&quot;0&quot;,0,0))
 ValueError: Value 0 not valid for a logarithmic function
-ln(-1)
-ValueError: Value '-1' not valid for a logarithmic functionNone</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+&gt;&gt;&gt; ln(-1)
+ValueError: Value '-1' not valid for a logarithmic functionNone
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def ln(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the natural log
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the natural log
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;ln({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; ln(Node(&#34;1&#34;,1,0))
-     Node(&#34;ln(1)&#34;, 0, 1)
-     &gt;&gt;&gt; ln(Node(&#34;0&#34;,0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     &gt;&gt;&gt; ln(-1)
-     ValueError: Value &#39;-1&#39; not valid for a logarithmic functionNone
+    Examples
+    --------
+    &gt;&gt;&gt; ln(Node(&#34;1&#34;,1,0))
+    Node(&#34;ln(1)&#34;, 0, 1)
+    &gt;&gt;&gt; ln(Node(&#34;0&#34;,0,0))
+    ValueError: Value 0 not valid for a logarithmic function
+    &gt;&gt;&gt; ln(-1)
+    ValueError: Value &#39;-1&#39; not valid for a logarithmic functionNone
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;ln({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_log_domain_restrictions(x)
 
     forward_trace = np.log(x.value)
     tangent_trace = 1 / x.value
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
-<dt id="autodiff_team29.elementaries.log10"><code class="name flex">
-<span>def <span class="ident">log10</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
+<dt id="autodiff_team29.elementaries.log"><code class="name flex">
+<span>def <span class="ident">log</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>], base: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>] = 2.718281828459045) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
-representation, forward trace, and tangent trace, which are based on the base 10
-logarithm of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "log10({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>log10(Node("1",1,0))
-Node("log10(1)", 0, 0.4343)
-log10(Node("0",0,0))
+representation, forward trace, and tangent trace, which are based on the logarithm
+of the input node x and the provided base.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>base</code></strong> :&ensp;<code>Union[int, float]</code></dt>
+<dd>The desired base of the logorithm. Must be an integer or float greater than 1.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; log(Node(&quot;1&quot;,1,0), 10)
+Node(&quot;log10(1)&quot;, 0, 0.4343)
+&gt;&gt;&gt; log(Node(&quot;1&quot;,1,0), 2)
+Node(&quot;log2(1)&quot;, 0, 1.4427)
+&gt;&gt;&gt; log(Node(&quot;0&quot;,0,0))
 ValueError: Value 0 not valid for a logarithmic function
-log10(Node("-1",-1,0))
-ValueError: Value -1 not valid for a logarithmic function</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+&gt;&gt;&gt; log(Node(&quot;-1&quot;,-1,0))
+ValueError: Value -1 not valid for a logarithmic function
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log10(x: Union[int, float, Node]) -&gt; Node:
+<pre><code class="python">def log(x: Union[int, float, Node], base: Union[int, float, Node] = np.e) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the base 10
-     logarithm of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the logarithm
+    of the input node x and the provided base.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;log10({})&#34;, its forward trace, and
-         tangent trace.
+    base : Union[int, float]
+        The desired base of the logorithm. Must be an integer or float greater than 1.
 
-     Examples
-     --------
-     &gt;&gt;&gt; log10(Node(&#34;1&#34;,1,0))
-     Node(&#34;log10(1)&#34;, 0, 0.4343)
-     &gt;&gt;&gt; log10(Node(&#34;0&#34;,0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     &gt;&gt;&gt; log10(Node(&#34;-1&#34;,-1,0))
-     ValueError: Value -1 not valid for a logarithmic function
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; log(Node(&#34;1&#34;,1,0), 10)
+    Node(&#34;log10(1)&#34;, 0, 0.4343)
+    &gt;&gt;&gt; log(Node(&#34;1&#34;,1,0), 2)
+    Node(&#34;log2(1)&#34;, 0, 1.4427)
+    &gt;&gt;&gt; log(Node(&#34;0&#34;,0,0))
+    ValueError: Value 0 not valid for a logarithmic function
+    &gt;&gt;&gt; log(Node(&#34;-1&#34;,-1,0))
+    ValueError: Value -1 not valid for a logarithmic function
 
     &#34;&#34;&#34;
-    symbolic_representation = &#34;log10({})&#34;.format(str(x))
+    if not base &gt; 1:
+        raise ValueError(&#34;Base must be greater than 1&#34;)
+
+    symbolic_representation = f&#34;log{str(base)}({str(x)})&#34;
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_log_domain_restrictions(x)
 
-    forward_trace = np.log10(x.value)
-    tangent_trace = 1 / (x.value * np.log(10))
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    forward_trace = math.log(x.value, base)
+    tangent_trace = 1 / (x.value * np.log(base))
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
-<dt id="autodiff_team29.elementaries.log2"><code class="name flex">
-<span>def <span class="ident">log2</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
+<dt id="autodiff_team29.elementaries.logistic"><code class="name flex">
+<span>def <span class="ident">logistic</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
-representation, forward trace, and tangent trace, which are based on the base 2
-logarithm of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "log2({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>log2(Node("1",1,0))
-Node("log2(1)", 0, 1.4427)
-log2(Node("0",0,0))
-ValueError: Value 0 not valid for a logarithmic function
-log2(Node("-1",-1,0))
-ValueError: Value '-1' not valid for a logarithmic function</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+representation, forward trace, and tangent trace, which are based on the
+of the input node x.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; logistic(1)
+Node(&quot;logistic(1)&quot;, 1.1752011936438014, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def log2(x: Union[int, float, Node]) -&gt; Node:
+<pre><code class="python">def logistic(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the base 2
-     logarithm of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;log2({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; log2(Node(&#34;1&#34;,1,0))
-     Node(&#34;log2(1)&#34;, 0, 1.4427)
-     &gt;&gt;&gt; log2(Node(&#34;0&#34;,0,0))
-     ValueError: Value 0 not valid for a logarithmic function
-     &gt;&gt;&gt; log2(Node(&#34;-1&#34;,-1,0))
-     ValueError: Value &#39;-1&#39; not valid for a logarithmic function
+    Examples
+    --------
+    &gt;&gt;&gt; logistic(1)
+    Node(&#34;logistic(1)&#34;, 1.1752011936438014, 0)
 
     &#34;&#34;&#34;
-    symbolic_representation = &#34;log2({})&#34;.format(str(x))
+    symbolic_representation = f&#34;logistic({x})&#34;
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
-    _check_log_domain_restrictions(x)
-
-    forward_trace = np.log2(x.value)
-    tangent_trace = 1 / (x.value * np.log(2))
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
+    forward_trace = np.exp(-np.logaddexp(0, -x.value))
+    tangent_trace = (
+            (np.exp(-np.logaddexp(0, -x.value)))
+            * (1 - np.exp(-np.logaddexp(0, -x.value)))
+            * x.derivative
     )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
+</details>
+</dd>
+<dt id="autodiff_team29.elementaries.power"><code class="name flex">
+<span>def <span class="ident">power</span></span>(<span>base: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>], exponent: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
+representation, forward trace, and tangent trace, which are based on the power
+of the input node x.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>base</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+<dt><strong><code>exponent</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; power(3,2)
+Node(&quot;3**2&quot;, 9, 0)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def power(base: Union[int, float, Node], exponent: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the power
+    of the input node x.
+
+    Parameters
+    ----------
+    base : Union[int, float, Node]
+    exponent : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+    Examples
+    --------
+    &gt;&gt;&gt; power(3,2)
+    Node(&#34;3**2&#34;, 9, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;({base}**{exponent})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    base = Node._convert_numeric_type_to_node(base)
+
+    return base ** exponent</code></pre>
 </details>
 </dd>
 <dt id="autodiff_team29.elementaries.sin"><code class="name flex">
@@ -1347,78 +1436,121 @@ ValueError: Value '-1' not valid for a logarithmic function</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the sine
 of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "sin({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>sin(Node("1",1,0))
-Node("sin(1)", 0.8415, 0)
-sin(Node("0",0,0))
-Node("sin(0)", 0, 0)
-sin(Node("-1",-1,0))
-Node("sin(-1)", -0.8415, 0)</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; sin(Node(&quot;1&quot;,1,0))
+Node(&quot;sin(1)&quot;, 0.8415, 0)
+&gt;&gt;&gt; sin(Node(&quot;0&quot;,0,0))
+Node(&quot;sin(0)&quot;, 0, 0)
+&gt;&gt;&gt; sin(Node(&quot;-1&quot;,-1,0))
+Node(&quot;sin(-1)&quot;, -0.8415, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sin(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the sine
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sine
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;sin({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; sin(Node(&#34;1&#34;,1,0))
-     Node(&#34;sin(1)&#34;, 0.8415, 0)
-     &gt;&gt;&gt; sin(Node(&#34;0&#34;,0,0))
-     Node(&#34;sin(0)&#34;, 0, 0)
-     &gt;&gt;&gt; sin(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;sin(-1)&#34;, -0.8415, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; sin(Node(&#34;1&#34;,1,0))
+    Node(&#34;sin(1)&#34;, 0.8415, 0)
+    &gt;&gt;&gt; sin(Node(&#34;0&#34;,0,0))
+    Node(&#34;sin(0)&#34;, 0, 0)
+    &gt;&gt;&gt; sin(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;sin(-1)&#34;, -0.8415, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;sin({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     forward_trace = np.sin(x.value)
     tangent_trace = np.cos(x.value) * x.derivative
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
+    return new_node</code></pre>
+</details>
+</dd>
+<dt id="autodiff_team29.elementaries.sinh"><code class="name flex">
+<span>def <span class="ident">sinh</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
+representation, forward trace, and tangent trace, which are based on the sinh
+of the input node x.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; sinh(1)
+Node(&quot;sinh(1)&quot;, 1.1752011936438014, 0)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sinh(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the sinh
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+
+    Examples
+    --------
+    &gt;&gt;&gt; sinh(1)
+    Node(&#34;sinh(1)&#34;, 1.1752011936438014, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;sinh({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.sinh(x.value)
+    tangent_trace = np.cosh(x.value) * x.derivative
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -1429,78 +1561,64 @@ Node("sin(-1)", -0.8415, 0)</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based of the square
 root of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "sqrt({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>sqrt(Node("1",1,0))
-Node("sqrt(1)", 1, 0)
-sqrt(Node("0",0,0))
-Node("sqrt(0)", 0, 0)
-sqrt(Node("-1",-1,0))
-ValueError: Square roots of negative numbers not supported</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; sqrt(Node(&quot;1&quot;,1,0))
+Node(&quot;sqrt(1)&quot;, 1, 0)
+&gt;&gt;&gt; sqrt(Node(&quot;0&quot;,0,0))
+Node(&quot;sqrt(0)&quot;, 0, 0)
+&gt;&gt;&gt; sqrt(Node(&quot;-1&quot;,-1,0))
+ValueError: Square roots of negative numbers not supported
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def sqrt(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based of the square
-     root of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based of the square
+    root of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;sqrt({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; sqrt(Node(&#34;1&#34;,1,0))
-     Node(&#34;sqrt(1)&#34;, 1, 0)
-     &gt;&gt;&gt; sqrt(Node(&#34;0&#34;,0,0))
-     Node(&#34;sqrt(0)&#34;, 0, 0)
-     &gt;&gt;&gt; sqrt(Node(&#34;-1&#34;,-1,0))
-     ValueError: Square roots of negative numbers not supported
+    Examples
+    --------
+    &gt;&gt;&gt; sqrt(Node(&#34;1&#34;,1,0))
+    Node(&#34;sqrt(1)&#34;, 1, 0)
+    &gt;&gt;&gt; sqrt(Node(&#34;0&#34;,0,0))
+    Node(&#34;sqrt(0)&#34;, 0, 0)
+    &gt;&gt;&gt; sqrt(Node(&#34;-1&#34;,-1,0))
+    ValueError: Square roots of negative numbers not supported
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;sqrt({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
 
     _check_sqrt_domain_restrictions(x)
 
     forward_trace = np.sqrt(x.value)
     tangent_trace = x.derivative / (2 * np.sqrt(x.value))
     new_node = Node(symbolic_representation, forward_trace, tangent_trace)
-    Node._insert_node_to_registry(new_node)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -1511,78 +1629,123 @@ ValueError: Square roots of negative numbers not supported</p>
 <div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
 representation, forward trace, and tangent trace, which are based on the tangent
 of the input node x.</p>
-<p>Parameters</p>
-<hr>
-<p>x : Union[int, float, Node]
-An instance of the Node class, where x.value is the numeric value of the node and
-x.deriative is the derivative of the node.</p>
-<p>Returns</p>
-<hr>
-<p>Node
-If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-Else, returns new_node, which is a new instance of the Node class and contains three
-inputs: the symbolic representation of the node "tan({})", its forward trace, and
-tangent trace.</p>
-<p>Examples</p>
-<hr>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>tan(Node("1",1,0))
-Node("tan(1)", 1.557, 0)
-tan(Node("0",0,0))
-Node("tan(0)", 0, 0)
-tan(Node("-1",-1,0))
-Node("tan(-1)", -1.557, 0)</p>
-</blockquote>
-</blockquote>
-</blockquote></div>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; tan(Node(&quot;1&quot;,1,0))
+Node(&quot;tan(1)&quot;, 1.557, 0)
+&gt;&gt;&gt; tan(Node(&quot;0&quot;,0,0))
+Node(&quot;tan(0)&quot;, 0, 0)
+&gt;&gt;&gt; tan(Node(&quot;-1&quot;,-1,0))
+Node(&quot;tan(-1)&quot;, -1.557, 0)
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def tan(x: Union[int, float, Node]) -&gt; Node:
     &#34;&#34;&#34;
-     Takes in an instance of the Node class and returns a new node with its symbolic
-     representation, forward trace, and tangent trace, which are based on the tangent
-     of the input node x.
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the tangent
+    of the input node x.
 
     Parameters
-     ----------
-     x : Union[int, float, Node]
-         An instance of the Node class, where x.value is the numeric value of the node and
-         x.deriative is the derivative of the node.
+    ----------
+    x : Union[int, float, Node]
 
-     Returns
-     -------
-     Node
-         If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-         Else, returns new_node, which is a new instance of the Node class and contains three
-         inputs: the symbolic representation of the node &#34;tan({})&#34;, its forward trace, and
-         tangent trace.
+    Returns
+    -------
+    Node
 
-     Examples
-     --------
-     &gt;&gt;&gt; tan(Node(&#34;1&#34;,1,0))
-     Node(&#34;tan(1)&#34;, 1.557, 0)
-     &gt;&gt;&gt; tan(Node(&#34;0&#34;,0,0))
-     Node(&#34;tan(0)&#34;, 0, 0)
-     &gt;&gt;&gt; tan(Node(&#34;-1&#34;,-1,0))
-     Node(&#34;tan(-1)&#34;, -1.557, 0)
+    Examples
+    --------
+    &gt;&gt;&gt; tan(Node(&#34;1&#34;,1,0))
+    Node(&#34;tan(1)&#34;, 1.557, 0)
+    &gt;&gt;&gt; tan(Node(&#34;0&#34;,0,0))
+    Node(&#34;tan(0)&#34;, 0, 0)
+    &gt;&gt;&gt; tan(Node(&#34;-1&#34;,-1,0))
+    Node(&#34;tan(-1)&#34;, -1.557, 0)
 
     &#34;&#34;&#34;
     symbolic_representation = &#34;tan({})&#34;.format(str(x))
     if Node._check_node_exists(symbolic_representation):
         return Node._get_existing_node(symbolic_representation)
 
-    x = Node.convert_to_node(x)
+    x = Node._convert_numeric_type_to_node(x)
+
+    _check_tan_domain_restrictions(x)
 
     forward_trace = np.tan(x.value)
     tangent_trace = x.derivative / (np.cos(x.value) ** 2)
-    new_node = Node(
-        symbolic_representation, forward_trace, tangent_trace, supress_warning=True
-    )
-    Node._insert_node_to_registry(new_node)
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
+    return new_node</code></pre>
+</details>
+</dd>
+<dt id="autodiff_team29.elementaries.tanh"><code class="name flex">
+<span>def <span class="ident">tanh</span></span>(<span>x: Union[int, float, <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a>]) ‑> <a title="autodiff_team29.node.Node" href="node.html#autodiff_team29.node.Node">Node</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in an instance of the Node class and returns a new node with its symbolic
+representation, forward trace, and tangent trace, which are based on the
+of the input node x.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>Union[int, float, Node]</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Node</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; tanh(1)
+Node(&quot;tanh(1)&quot;, 0.76159415595, 0)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tanh(x: Union[int, float, Node]) -&gt; Node:
+    &#34;&#34;&#34;
+    Takes in an instance of the Node class and returns a new node with its symbolic
+    representation, forward trace, and tangent trace, which are based on the
+    of the input node x.
+
+    Parameters
+    ----------
+    x : Union[int, float, Node]
+
+    Returns
+    -------
+    Node
+
+
+    Examples
+    --------
+    &gt;&gt;&gt; tanh(1)
+    Node(&#34;tanh(1)&#34;, 0.76159415595, 0)
+
+    &#34;&#34;&#34;
+    symbolic_representation = f&#34;tanh({x})&#34;
+    if Node._check_node_exists(symbolic_representation):
+        return Node._get_existing_node(symbolic_representation)
+
+    x = Node._convert_numeric_type_to_node(x)
+
+    forward_trace = np.tanh(x.value)
+    tangent_trace = (1 - np.tanh(x.value) ** 2) * x.derivative
+    new_node = Node(symbolic_representation, forward_trace, tangent_trace)
+
     return new_node</code></pre>
 </details>
 </dd>
@@ -1608,13 +1771,17 @@ Node("tan(-1)", -1.557, 0)</p>
 <li><code><a title="autodiff_team29.elementaries.arcsin" href="#autodiff_team29.elementaries.arcsin">arcsin</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.arctan" href="#autodiff_team29.elementaries.arctan">arctan</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.cos" href="#autodiff_team29.elementaries.cos">cos</a></code></li>
+<li><code><a title="autodiff_team29.elementaries.cosh" href="#autodiff_team29.elementaries.cosh">cosh</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.exp" href="#autodiff_team29.elementaries.exp">exp</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.ln" href="#autodiff_team29.elementaries.ln">ln</a></code></li>
-<li><code><a title="autodiff_team29.elementaries.log10" href="#autodiff_team29.elementaries.log10">log10</a></code></li>
-<li><code><a title="autodiff_team29.elementaries.log2" href="#autodiff_team29.elementaries.log2">log2</a></code></li>
+<li><code><a title="autodiff_team29.elementaries.log" href="#autodiff_team29.elementaries.log">log</a></code></li>
+<li><code><a title="autodiff_team29.elementaries.logistic" href="#autodiff_team29.elementaries.logistic">logistic</a></code></li>
+<li><code><a title="autodiff_team29.elementaries.power" href="#autodiff_team29.elementaries.power">power</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.sin" href="#autodiff_team29.elementaries.sin">sin</a></code></li>
+<li><code><a title="autodiff_team29.elementaries.sinh" href="#autodiff_team29.elementaries.sinh">sinh</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.sqrt" href="#autodiff_team29.elementaries.sqrt">sqrt</a></code></li>
 <li><code><a title="autodiff_team29.elementaries.tan" href="#autodiff_team29.elementaries.tan">tan</a></code></li>
+<li><code><a title="autodiff_team29.elementaries.tanh" href="#autodiff_team29.elementaries.tanh">tanh</a></code></li>
 </ul>
 </li>
 </ul>

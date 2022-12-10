@@ -56,7 +56,7 @@ class VectorFunction:
         An instantiation would be
         &gt;&gt;&gt; x = Node(&#34;x&#34;, 2, 1 ,seed_vector=[1,0])
         &gt;&gt;&gt; y = Node(&#34;y&#34;, 3, 1, seed_vector=[0,1])
-        &gt;&gt;&gt; f = VectorFunction([x + y, x - 2*y])
+        &gt;&gt;&gt; f = VectorFunction([x + y, x - 2 * y])
 
         &#34;&#34;&#34;
 
@@ -67,7 +67,7 @@ class VectorFunction:
             raise ValueError(&#34;functions argument must be a list of Nodes&#34;)
 
     @property
-    def symbol(self) -&gt; NDArray[str]:
+    def symbol(self) -&gt; str:
         &#34;&#34;&#34;
         Returns the symbolic representation of the vector function
 
@@ -119,7 +119,7 @@ Raise value error if functions is not List[Node]</p>
 An instantiation would be</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; x = Node(&quot;x&quot;, 2, 1 ,seed_vector=[1,0])
 &gt;&gt;&gt; y = Node(&quot;y&quot;, 3, 1, seed_vector=[0,1])
-&gt;&gt;&gt; f = VectorFunction([x + y, x - 2*y])
+&gt;&gt;&gt; f = VectorFunction([x + y, x - 2 * y])
 </code></pre></div>
 <details class="source">
 <summary>
@@ -147,7 +147,7 @@ An instantiation would be</p>
         An instantiation would be
         &gt;&gt;&gt; x = Node(&#34;x&#34;, 2, 1 ,seed_vector=[1,0])
         &gt;&gt;&gt; y = Node(&#34;y&#34;, 3, 1, seed_vector=[0,1])
-        &gt;&gt;&gt; f = VectorFunction([x + y, x - 2*y])
+        &gt;&gt;&gt; f = VectorFunction([x + y, x - 2 * y])
 
         &#34;&#34;&#34;
 
@@ -158,7 +158,7 @@ An instantiation would be</p>
             raise ValueError(&#34;functions argument must be a list of Nodes&#34;)
 
     @property
-    def symbol(self) -&gt; NDArray[str]:
+    def symbol(self) -&gt; str:
         &#34;&#34;&#34;
         Returns the symbolic representation of the vector function
 
@@ -199,7 +199,7 @@ def jacobian(self) -&gt; NDArray[float]:
     return np.array([function.derivative for function in self._functions])</code></pre>
 </details>
 </dd>
-<dt id="autodiff_team29.vector_function.VectorFunction.symbol"><code class="name">var <span class="ident">symbol</span> : numpy.ndarray[typing.Any, numpy.dtype[str]]</code></dt>
+<dt id="autodiff_team29.vector_function.VectorFunction.symbol"><code class="name">var <span class="ident">symbol</span> : str</code></dt>
 <dd>
 <div class="desc"><p>Returns the symbolic representation of the vector function</p></div>
 <details class="source">
@@ -207,7 +207,7 @@ def jacobian(self) -&gt; NDArray[float]:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
-def symbol(self) -&gt; NDArray[str]:
+def symbol(self) -&gt; str:
     &#34;&#34;&#34;
     Returns the symbolic representation of the vector function
 
