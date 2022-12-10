@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "alpha-delta-team29"
-version = "1.0.0"
+version = "1.0.1"
 description = "derivatives, chain rule, and other cool stuff"
 authors = [
         {name="Andrew", email="andrewsullivan@g.harvard.edu"},
