@@ -179,7 +179,7 @@ We have provided examples of how to implement each scenario in the repository fo
 
 - Vector inputs: $f(x):\mathbb{R}^m\mapsto\mathbb{R}$. This could also be written as $f(x_1,x_2,\ldots,x_m)$ ([example script](https://code.harvard.edu/CS107/team29/blob/main/vector_to_scalar.py)). 
   
-- Multiple vector inputs $f(a,b)$.$f(a,b)$ can be always be cast in the form $f(x)$ where $x$ is the concatenation of $a$ and $b$. ([example_script](https://code.harvard.edu/CS107/team29/blob/main/vector_to_vector.py))
+- Multiple vector inputs $f(a,b)$.$f(a,b)$ can be always be cast in the form $f(x)$ where $x$ is the concatenation of $a$ and $b$. ([example_script](https://code.harvard.edu/CS107/team29/blob/main/vector_of_scalar_functions.py))
 
 - Vector functions $f(x):\mathbb{R}^m\mapsto\mathbb{R}^n$ ([example_script](https://code.harvard.edu/CS107/team29/blob/main/matrix_case.py))
 
@@ -194,6 +194,12 @@ The module adheres to the following structure:
 
 ```
 └── team29
+    ── .github
+    │   └── workflows
+    │       ├── code_coverage.yml
+    │       ├── deploy_PyPI.yml
+    │       └── run_tests.yml
+    ├── .gitignore
     ├── autodiff_team29
     │   ├── __init__.py
     │   ├── elementaries.py
