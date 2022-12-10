@@ -5,7 +5,7 @@ from autodiff_team29 import VectorFunction
 import numpy as np
 
 # Scalar case
-x  = Node(symbol = 'x', value = n[.pi, derivative =1)
+x  = Node(symbol = 'x', value = np.pi, derivative =1)
 
 print('Node aspects:')
 print(f"Symbol: {x.symbol}")
