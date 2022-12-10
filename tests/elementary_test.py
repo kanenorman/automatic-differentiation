@@ -283,3 +283,117 @@ class TestMathFunctions:
         expect(elementaries.arctan(value).symbol).to(equal("arctan(x)"))
         expect(elementaries.arctan(value).value).to(equal(np.arctan(0.5)))
         expect(elementaries.arctan(value).derivative).to(equal(1 / (1 + 0.5**2)))
+       
+    def test_power(self):
+        """
+        Test power function
+        """
+        # int case
+        value = 10
+        base = 10
+        expect(elementaries.power(value, base).symbol).to(equal("(10**10)"))
+        expect(elementaries.power(value, base).value).to(equal(np.power(10,10)))
+        expect(elementaries.power(value, base).derivative).to(equal(0))
+
+        # float case
+        value = 10.0
+        base = 2
+        expect(elementaries.power(value, base).symbol).to(equal("(10.0**2)"))
+        expect(np.isclose(elementaries.power(value, base).value, np.power(10.0, 2))).to(equal(True))
+        expect(elementaries.power(value, base).derivative).to(equal(0))
+
+        # node case
+        value = Node("x", 10, 1)
+        base = 10
+        expect(elementaries.power(value, base).symbol).to(equal("(x**10)"))
+        expect(np.isclose(elementaries.power(value, base).value, np.power(10,10))).to(equal(True))
+        expect(elementaries.power(value, base).derivative).to(equal(np.power(10,10)))
+
+    def test_sinh(self):
+        """
+        Test sinh function
+        """
+        # int case
+        value = 1
+        expect(elementaries.sinh(value).symbol).to(equal("sinh(1)"))
+        expect(elementaries.sinh(value).value).to(equal(np.sinh(1)))
+        expect(elementaries.sinh(value).derivative).to(equal(0))
+
+        # float case
+        value = 1.0
+        expect(elementaries.sinh(value).symbol).to(equal("sinh(1.0)"))
+        expect(elementaries.sinh(value).value).to(equal(np.sinh(1.0)))
+        expect(elementaries.sinh(value).derivative).to(equal(0))
+
+        # node case
+        value = Node("x", 1, 1)
+        expect(elementaries.sinh(value).symbol).to(equal("sinh(x)"))
+        expect(elementaries.sinh(value).value).to(equal(np.sinh(1)))
+        expect(elementaries.sinh(value).derivative).to(equal(np.cosh(1)))
+
+    def test_cosh(self):
+        """
+        Test cosh function
+        """
+        # int case
+        value = 1
+        expect(elementaries.cosh(value).symbol).to(equal("cosh(1)"))
+        expect(elementaries.cosh(value).value).to(equal(np.cosh(1)))
+        expect(elementaries.cosh(value).derivative).to(equal(0))
+
+        # float case
+        value = 1.0
+        expect(elementaries.cosh(value).symbol).to(equal("cosh(1.0)"))
+        expect(elementaries.cosh(value).value).to(equal(np.cosh(1.0)))
+        expect(elementaries.cosh(value).derivative).to(equal(0))
+
+        # node case
+        value = Node("x", 1, 1)
+        expect(elementaries.cosh(value).symbol).to(equal("cosh(x)"))
+        expect(elementaries.cosh(value).value).to(equal(np.cosh(1)))
+        expect(elementaries.cosh(value).derivative).to(equal(np.sinh(1)))
+   
+    def test_tanh(self):
+        """
+        Test tanh function
+        """
+        # int case
+        value = 1
+        expect(elementaries.tanh(value).symbol).to(equal("tanh(1)"))
+        expect(elementaries.tanh(value).value).to(equal(np.tanh(1)))
+        expect(elementaries.tanh(value).derivative).to(equal(0))
+
+        # float case
+        value = 1.0
+        expect(elementaries.tanh(value).symbol).to(equal("tanh(1.0)"))
+        expect(elementaries.tanh(value).value).to(equal(np.tanh(1.0)))
+        expect(elementaries.tanh(value).derivative).to(equal(0))
+
+        # node case
+        value = Node("x", 1, 1)
+        expect(elementaries.tanh(value).symbol).to(equal("tanh(x)"))
+        expect(elementaries.tanh(value).value).to(equal(np.tanh(1)))
+        expect(elementaries.tanh(value).derivative).to(equal(1 - np.tanh(1)**2))
+
+    def test_logistic(self):
+        """
+        Test logistic function
+        """
+        # int case
+        value = 1
+        expect(elementaries.logistic(value).symbol).to(equal("logistic(1)"))
+        expect(elementaries.logistic(value).value).to(equal(np.exp(-np.logaddexp(0, -1))))
+        expect(elementaries.logistic(value).derivative).to(equal(0))
+
+        # float case
+        value = 1.0
+        expect(elementaries.logistic(value).symbol).to(equal("logistic(1.0)"))
+        expect(elementaries.logistic(value).value).to(equal(np.exp(-np.logaddexp(0, -1.0))))
+        expect(elementaries.logistic(value).derivative).to(equal(0))
+
+        # node case
+        value = Node("x", 1, 1)
+        expect(elementaries.logistic(value).symbol).to(equal("logistic(x)"))
+        expect(elementaries.logistic(value).value).to(equal(np.exp(-np.logaddexp(0, -1))))
+        sigmoid = np.exp(-np.logaddexp(0, -1))
+        expect(elementaries.logistic(value).derivative).to(equal(sigmoid * (1 - sigmoid)))
