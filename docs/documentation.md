@@ -71,7 +71,7 @@ Seed vectors often come into play when we want to find $ \frac {\partial f_i} {\
 
 ### Evaluation (Forward) Trace
 
-_Definition_: Suppose x = $ \begin{bmatrix} {x*1} \\ \vdots \\ {x_m} \end{bmatrix} $, we defined $ v*{k - m} = x_k $ for $ k = 1, 2, ..., m $ in the evaluation trace.
+_Definition_: Suppose $x = \begin{bmatrix} x_1 \\ \ldots \\ x_m \end{bmatrix}^T $, we defined $ v\_{k - m} = x_k $ for $ k = 1, 2, ..., m $ in the evaluation trace.
 
 _Motivation_: The evaluation trace introduces intermediate results $ v\_{k-m} $ of elementary operations to track the differentiation.
 
@@ -87,10 +87,10 @@ $ \nabla f = \begin{bmatrix} \frac {\partial f} {\partial x_1} \\ \frac {\partia
 | ---------------------- | --------------------------------- | ---------------------------- | ------------------------ |
 | $v_{-1} = x_1$         | $ p_1 $                           | 1                            | 0                        |
 | $v_{0} = x_2$          | $ p_2 $                           | 0                            | 1                        |
-| $v_{1} = v_{-1} + v_0$ | $ D*p v*{-1} + D_p v_0 $          | 1                            | 1                        |
+| $v_{1} = v_{-1} + v_0$ | $ D*p v_{-1} + D_p v_0 $          | 1                            | 1                        |
 | $v_{2} = sin(v_1)$     | $ \cos(v_1) D_p v_1 $             | $ \cos(11) $                 | $ \cos(11) $             |
-| $v_{3} = log(v_{-1})$  | $ \frac {1} {v*{-1}} D_p v*{-1} $ | $ \frac {1} {7} $            | 0                        |
-| $v\_{4} = v_3 + v_2 $  | $ D*p v*{3} + D_p v_2 $           | $ \frac {1} {7} + \cos(11) $ | $ \cos(11) $             |
+| $v_{3} = log(v_{-1})$  | $ \frac {1} {v_{-1}} D_p v_{-1} $ | $ \frac {1} {7} $            | 0                        |
+| $v\_{4} = v_3 + v_2 $  | $ D*p v_{3} + D_p v_2 $           | $ \frac {1} {7} + \cos(11) $ | $ \cos(11) $             |
 
 $D_p v_{-1} = \nabla v_{-1}^T p = (\frac {\partial v_{-1}} {\partial x_1} \nabla x_{1})^T p = (\nabla x_{1})^T p = p_1$
 
@@ -121,7 +121,7 @@ _Step 1:_ Calculate $ \frac {\partial f} {\partial v_j} $
 _Step 2:_ Calculate $ \frac {\partial v\_{j}} {\partial v_i} $ where $ v_i $ is the immediate predecessor of $ v_j $
 
 _Step 3:_ Multiply the result obtained in step 1 and step 2, which results in the following:
-$ \frac {\partial f} {\partial v*j} \frac {\partial v*{j}} {\partial v_i} $
+$ \frac {\partial f} {\partial v_j} \frac {\partial v_j} {\partial v_i} $
 
 ## How to Use
 
@@ -133,12 +133,22 @@ The module is available on PyPI. Use the following command for installation.
 python -m pip install --extra-index-url=https://test.pypi.org/simple/ alpha-delta-team29
 ```
 
+(alternatively clone the repository)
+```angular2html
+git clone git@code.harvard.edu:CS107/team29.git
+```
+
+### Public Interface (Documentation Reference)
+Please refer to the full [API reference](https://cs107-team29.000webhostapp.com/index.html) 
+
+*Please note, we are hosting this via a free service that does experience temporary disruptuons. If having difficulties please refer to the HTML files located [in the repository](https://code.harvard.edu/CS107/team29/tree/main/docs/docs_htmls)*
+
 ### Example Usage
 
 Suppose we wish to take of the derivative of ```f(x) = sin(x) + x``` with respect to ```x``` at ```x = 5```. We first must first cast our variable, ```x```, as a node:
 
 ```
-from autodiff_team29.node import Node
+from autodiff_team29 import Node
 
 x = Node(symbol='x', value=5, derivative=1)
 ```
@@ -161,109 +171,61 @@ repr(f)
 Node((sin(x)+x),4.041075725336862,1.2836621854632262)
 ```
 
-### Public Interface
+### Project Requirements. 
+We are required to support a few different scenarios.  
+We have provided examples of how to implement each scenario in the repository for convience.
 
-#### *node.Node (class)*
-```commandline
-Represents a node which is the foundation of a computational graph.
+- Scalar inputs: $f(x):R \mapsto R$ ([example script](https://code.harvard.edu/CS107/team29/blob/main/scalar_to_scalar.py))
 
-Parameters
-----------
-symbol: str
-        Symbolic representation of a Node instance that acts as a unique identifier.
-value: int, float, or np.ndarray
-        Analytical value of the node.
-derivative: int, float, or np.ndarray consisting of either type int/float , optional, default = 1
-        Derivative with respect to the value attribute
+- Vector inputs: $f(x):\mathbb{R}^m\mapsto\mathbb{R}$. This could also be written as $f(x_1,x_2,\ldots,x_m)$ ([example script](https://code.harvard.edu/CS107/team29/blob/main/vector_to_scalar.py)). 
+  
+- Multiple vector inputs $f(a,b)$.$f(a,b)$ can be always be cast in the form $f(x)$ where $x$ is the concatenation of $a$ and $b$. ([example_script](https://code.harvard.edu/CS107/team29/blob/main/vector_to_vector.py))
 
-Examples
---------
-> x = Node('x', 10, 1)
-Node('x', 10, 1)
-> y = Node('y', 20)
-Node('y', 20, 1)
-```
+- Vector functions $f(x):\mathbb{R}^m\mapsto\mathbb{R}^n$ ([example_script](https://code.harvard.edu/CS107/team29/blob/main/matrix_case.py))
 
-#### *node.Node.symbol (function)*
-```commandline
-returns str: Symbolic representation of a Node instance that acts as a unique identifier.
-```
-#### *node.Node.value (function)*
-```commandline
-returns int, float, or np.ndarray: Analytical value of the node.
-```
-#### *node.Node.derivative (function)*
-```commandline
-returns int, float, or np.ndarray: Derivative with respect to the value attribute
-```
 
-#### *elementaries.sqrt (function)*
-#### *elementaries.ln (function)*
-#### *elementaries.log (function)*
-#### *elementaries.exp (function)*
-#### *elementaries.sin (function)*
-#### *elementaries.cos (function)*
-#### *elementaries.tan (function)*
-#### *elementaries.arcsin (function)*
-#### *elementaries.arccos (function)*
-#### *elementaries.arctan (function)*
-```commandline
-    Takes in an instance class Node, int, float, or np.ndarray and returns a new node with its symbolic
-    representation, forward trace, and tangent trace, which are based of the input x.
 
-    Parameters
-    ----------
-    x: Node, int, float, or np.ndarray 
 
-    Returns
-    -------
-    Node
-        If the node already exists in the Node._NODE_REGISTRY, returns the existing node.
-        Otherwise, returns a new instance of class Node and containing the symbolic representation of the node , its forward trace, and 
-        tangent trace.
-        
-    Raises
-    ------
-    ValueError
-        If x is not a volid input for the domain of the function
-    
-    Examples
-    --------
-    >>> ln(Node("1",1,0))
-    Node("ln(1)", 0, 1)
- 
-    >>> sqrt(Node("-1",-1,0))
-    ValueError: Square roots of negative numbers not supported
-```
+
+
 ## Software Organization 
 
 The module adheres to the following structure:
 
 ```
-📦repo
- ┣ 📂.github
- ┃ ┗ 📂workflows
- ┃ ┃ ┣ 📜code_coverage.yml
- ┃ ┃ ┣ 📜deploy_PyPI.yml
- ┃ ┃ ┗ 📜run_tests.yml
- ┣ 📂autodiff_team29
- ┃ ┣ 📜__init__.py
- ┃ ┣ 📜elementaries.py
- ┃ ┗ 📜node.py
- ┣ docs
- ┃ ┣ 📜documentation.md
- ┃ ┣ 📜milestone1.md
- ┃ ┣ 📜milestone1.pdf
- ┃ ┗ 📜milestone2_progress.md
- ┣ 📂tests
- ┃ ┣ 📜__init__.py
- ┃ ┣ 📜elementary_test.py
- ┃ ┗ 📜node_test.py
- ┣ 📜.gitignore
- ┣ 📜LICENSE
- ┣ 📜README.md
- ┣ 📜poetry.lock
- ┗ 📜pyproject.toml
+└── team29
+    ├── autodiff_team29
+    │   ├── __init__.py
+    │   ├── elementaries.py
+    │   ├── node.py
+    │   └── vector_function.py
+    ├── docs
+    │   ├── benchmark_results.png
+    │   ├── docs_htmls
+    │   │   ├── elementaries.html
+    │   │   ├── index.html
+    │   │   ├── node.html
+    │   │   └── vector_function.html
+    │   ├── documentation.md
+    │   └── optimization_benchmark.py
+    ├── milestone_archive
+    │   ├── milestone1.md
+    │   ├── milestone1.pdf
+    │   └── milestone2_progress.md
+    ├── tests
+    │   ├── __init__.py
+    │   ├── conftest.py
+    │   ├── elementary_test.py
+    │   ├── node_test.py
+    │   └── vector_function_test.py
+    ├── LICENSE
+    ├── README.md
+    ├── pyproject.toml
+    ├── scalar_to_scalar.py
+    ├── scalar_to_vector_case.py
+    ├── matrix_case.py
+    └── vector_of_scalar_functions.py
+    
 ```
 
 The two core modules are ```node``` and ```elementaries```. ```node``` defines a class, ```Node```, used to instantiate variables and their partial derivatives. ```elementaries``` houses a battery of functions with which users can create custom functions (see the example above for further details). Importantly, users may not use elementary functions provided by other modules such as ```math``` or ```numpy``` as only those in ```autodiff_team29.elementaries``` are built to operate on objects of type ```Node```.  
@@ -290,25 +252,25 @@ $$
 g(x) = f(x) + f^2(x) + \dots + f^n(x) = \sum_{i=1}^nf^i(x)
 $$
 
-where the superscript notation indicates iterative function calls ($f^2(x) = f(f(x))$). When computed without a registry, $g(x)$ requires $\sum_{i=1}^ni$ computations; with a registry, $g(x)$ requires $n$ computations (one for each term in $g$ -- subsequent terms need only apply $f$ once more to the previous term) and $\sum_{i=1}^ni$ registry checks (if we include failed checks for new nodes). Let $t_c$ be the computation time for $f$ and $t_r$ be the lookup time for the node registry. We can formalize the registry trade-off:
+where the superscript notation indicates iterative function calls ($f^2(x) = f(f(x))$). When computed without a registry, $g(x)$ requires $n$ computations; with a registry, $g(x)$ requires $n$ computations (one for each term in $g$ -- subsequent terms need only apply $f$ once more to the previous term) and $n$ registry checks (if we include failed checks for new nodes). Let $t_c$ be the computation time for $f$ and $t_r$ be the lookup time for the node registry. We can formalize the registry trade-off:
 
 $$
-t_c\sum_{i=1}^ni = t_cn + t_r\sum_{i=1}^ni
+t_c\sum_{i=1}^{n} = t_cn + t_r\sum_{i=1}^{n}
 $$
 
 We now solve for the ratio of the computation times for better interpretation. 
 
 $$
-\frac{t_c}{t_r} = \frac{\sum_{i=1}^ni}{\sum_{i=1}^{n-1}i}
+\frac{n}{{n-1}}
 $$
 
 For a given $t_c$, $t_r$, and $n$; the registry reduces time complexity if and only if:
 
 $$
-\frac{t_c}{t_r} > \frac{\sum_{i=1}^ni}{\sum_{i=1}^{n-1}i}
+\frac{t_c}{t_r} > \frac{n}{n-1}
 $$
 
-Now consider $f(x) = \sqrt{x}$. Square root is a relatively expensive computation, and so $\frac{t_c}{t_r}$ is relatively large while look-up time remains constant. Belwo we plot the difference in autodiff time between registry and no-registry for this function We observe an exponential increase in time without the registry. 
+Now consider $f(x) = \sqrt{x}$. Square root is a relatively expensive computation, and so $\frac{t_c}{t_r}$ is relatively large while look-up time remains constant. Below we plot the difference in autodiff time between registry and no-registry for this function We observe an exponential increase in time without the registry. 
 
 ![benchmark_results](benchmark_results.png)
 
