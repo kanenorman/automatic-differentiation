@@ -17,12 +17,6 @@ print(f"Symbols: x1: {x1.symbol}, x2: {x2.symbol}")
 print(f"Values: x1: {x1.value}, x2: {x2.value}")
 print(f"Derivatives: x1: {x1.derivative}, x2: {x2.derivative}")
 
-# Defining a function 'f'
-f1, f2 = x1 * x2 + E.sin(x1), x1 + x2 + E.sin(x1*x2)
-
-# Instantiating the vector function
-f = VectorFunction([f1, f2])
-
 # Inspect f --> new 'Node' with consistent representation
 print("New Node representation:")
 print("Symbol:", f.symbol)
