@@ -72,7 +72,7 @@ class Node:
 
         # creating an instance of the class
         instance = super().__new__(cls)
-        instance._symbol = symbol
+        instance._symbol = str(symbol)
         instance._value = value
 
         # if kwargs are specified we are dealing with an n-dimensional function
