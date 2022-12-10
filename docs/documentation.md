@@ -312,7 +312,33 @@ Now consider $f(x) = \sqrt{x}$. Square root is a relatively expensive computatio
 
 ![benchmark_results](benchmark_results.png)
 
-If the wishes to disable the registry for a function with simple, unique computations, they can do so via the `set_overwrite_mode` method of the `Node` class.
+If the user wishes to disable the registry for a function with simple, unique computations, they can do so via the `set_overwrite_mode` method of the `Node` class. See the demo below for details.
+
+```
+from autodiff_team29.node import Node
+from autodiff_team29.elementaries import sqrt
+
+# number of chained calls
+N = 10
+
+# enable node registry (registry is enabled by default)
+Node.set_overwrite_mode(enabled=False)
+# # disable node registry
+# Node.set_overwrite_mode(enabled=True)
+
+# instantiate node with large value (difficult computation)
+x = Node("x", 123424341341544235, 1)
+
+# iterative square root
+def apply_n_square_roots(n, x):
+    value = x
+    for _ in range(1, n + 1):
+        value = sqrt(value)
+    return value
+
+f = sum([apply_n_square_roots(n, x) for n in range(N)])
+print(f.derivative)
+```
 
 ## Broader Impact and Inclusivity Statement
 

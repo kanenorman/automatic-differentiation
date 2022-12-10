@@ -39,7 +39,7 @@ class VectorFunction:
             raise ValueError("functions argument must be a list of Nodes")
 
     @property
-    def symbol(self) -> NDArray[str]:
+    def symbol(self) -> str:
         """
         Returns the symbolic representation of the vector function
 
