@@ -8,7 +8,7 @@
 > [Luke Stoner](https://code.harvard.edu/lus881).   
 
 ## Documentation
-https://cs107-team29.000webhostapp.com/node.html
+https://cs107-team29.000webhostapp.com/index.html
 
 ## Testing
 
@@ -18,7 +18,7 @@ https://cs107-team29.000webhostapp.com/node.html
 [Coverage Report](https://code.harvard.edu/pages/CS107/team29/)
 
 ## License
-[![PyPi license](https://badgen.net/pypi/license/pip/)](https://pypi.com/project/pip/)
+![PyPi license](https://badgen.net/pypi/license/pip/)
 
 ## Broader Impact and Inclusivity Statement
 
