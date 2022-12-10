@@ -328,11 +328,9 @@ We are excited about the potential impact of our work on automatic differentiati
 
 ### Inclusivity Statement
 
-As a community, we are dedicated to creating an inclusive and welcoming space for all individuals, regardless of their background or identity. We value and respect the unique experiences and perspectives of every member of our community, and we strive to create an environment where everyone feels safe, supported, and able to fully participate.
+As a community, we are dedicated to creating an inclusive and welcoming space for all individuals, regardless of their background or identity. We value and respect the unique experiences and perspectives of every member of our community, and we strive to create an environment where everyone feels safe, supported, and able to fully participate. 
 
-We are committed to providing access and accommodations for individuals with disabilities, and we will do our best to provide the necessary support to ensure that everyone can contribute to and benefit from our community.
-
-We encourage open and honest communication, and we expect all members of our community to treat each other with respect and kindness. We do not tolerate any form of discrimination, harassment, or any other behavior that detracts from the inclusivity of our community.
+Another important aspect of inclusivity is making sure that underrepresented groups are represented and included in the community. This includes individuals from marginalized backgrounds or communities, such as people of color, LGBTQ+ individuals, people with disabilities, and others. It's important to actively seek out and include the voices and perspectives of these individuals in the community, and to provide support and accommodations to ensure that they can fully participate. This can be done through outreach efforts, by providing resources and support specifically for these individuals, and by creating a welcoming and inclusive environment that makes everyone feel valued and respected. By taking these steps, we can help create a community that is truly inclusive and representative of all its members.
 
 We are excited to work together to build a vibrant and diverse community that celebrates the contributions of all individuals. Thank you for joining us on this journey.
 
