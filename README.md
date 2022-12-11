@@ -8,7 +8,9 @@
 > [Luke Stoner](https://code.harvard.edu/lus881).   
 
 ## Documentation
-https://cs107-team29.000webhostapp.com/index.html
+[Extended Documentation](https://code.harvard.edu/CS107/team29/blob/main/docs/documentation.md). 
+  
+[API Reference](https://cs107-team29.000webhostapp.com/index.html)
 
 ## Testing
 
