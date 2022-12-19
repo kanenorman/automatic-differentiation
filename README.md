@@ -10,8 +10,8 @@
 
 ## Testing
 
-<a href="https://github.com/kanenorman/derivative-dilemma/actions/workflows/run_tests.yml"> ![run test](https://github.com/kanenorman/derivative-dilemma/blob/main/.github/workflows/run_tests.yml/badge.svg?event=push) </a>
-<a href="https://github.com/kanenorman/derivative-dilemma/actions/workflows/code_coverage.yml"> ![code coverage](https://github.com/kanenorman/derivative-dilemma/blob/main/.github/workflows/code_coverage.yml/badge.svg?event=push) </a>
+<a href="https://github.com/kanenorman/derivative-dilemma/actions/workflows/run_tests.yml"> ![run test](https://github.com/kanenorman/derivative-dilemma/actions/workflows/run_test.yml/badge.svg?event=push) </a>
+<a href="https://github.com/kanenorman/derivative-dilemma/actions/workflows/code_coverage.yml"> ![code coverage](https://github.com/kanenorman/derivative-dilemma/actions/workflows/code_coverage.yml/badge.svg?event=push) </a>
 
 [Coverage Report](https://kanenorman.github.io/derivative-dilemma/)
 
