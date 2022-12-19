@@ -75,9 +75,9 @@ $$
 $$
 
 _Multi-dimensional (vector) Inputs_:
-Before discussing vector inputs, let's first take a look at the gradient operator $ \nabla $
+Before discussing vector inputs, let's first take a look at the gradient operator $\nabla$
 
-That is, for $ y\colon \mathbb {R} ^{n} \to \mathbb {R} $, its gradient $ \nabla y \colon \mathbb {R} ^{n} \to \mathbb {R} ^{n}$ is defined at the point $ x = (x_1, ..., x_n) $ in n-dimensional space as the vector:
+That is, for $y\colon \mathbb {R} ^{n} \to \mathbb {R}$, its gradient $\nabla y \colon \mathbb {R} ^{n} \to \mathbb {R} ^{n}$ is defined at the point $x = (x_1, ..., x_n)$ in n-dimensional space as the vector:
 
 $$
 \begin{align}
@@ -92,19 +92,19 @@ $$
 \end{align}
 $$
 
-We will introduce direction vector $ p $ later to retrieve the derivative with respect to each $ y_i $.
+We will introduce direction vector $p$ later to retrieve the derivative with respect to each $y_i$.
 
 ### Jacobian-vector Product
 
-The Jacobian-vector product is equivalent to the tangent trace in direction $ p $ if we input the same direction vector $p$:
+The Jacobian-vector product is equivalent to the tangent trace in direction $p$ if we input the same direction vector $p$:
 
-$ D_p v $ = $ J p $
+$D_pv=Jp$
 
 ### Seed Vector
 
 Seed vectors provide an efficient way to retrieve every element in a Jacobian matrix and also recover the full Jacobian in high dimensions.
 
-Seed vectors often come into play when we want to find $ \frac {\partial f_i} {\partial x_j} $, which corresponds to the $i, j$ element of the Jacobian matrix. In high dimension automatic differentiation, we will apply seed vectors at the end of the evaluation trace where we have recursively calculated the explicit forms of tangent trace of $ f_i $ and then multiply each of them by the indicator vector $ p_j $ where the $ j $-th element of the $ p $ vector is 1.
+Seed vectors often come into play when we want to find $\frac {\partial f_i} {\partial x_j}$, which corresponds to the $i, j$ element of the Jacobian matrix. In high dimension automatic differentiation, we will apply seed vectors at the end of the evaluation trace where we have recursively calculated the explicit forms of tangent trace of $f_i$ and then multiply each of them by the indicator vector $ p_j $ where the $j^{th}$ element of the $p$ vector is 1.
 
 ### Evaluation (Forward) Trace
 
@@ -122,12 +122,12 @@ $ \nabla f = \begin{bmatrix} \frac {\partial f} {\partial x_1} \\ \frac {\partia
 
 | Forward primal trace   | Forward tangent trace             | Pass with p = $[0, 1]^T$     | Pass with p = $[1, 0]^T$ |
 | ---------------------- | --------------------------------- | ---------------------------- | ------------------------ |
-| $v_{-1} = x_1$         | $ p_1 $                           | 1                            | 0                        |
-| $v_{0} = x_2$          | $ p_2 $                           | 0                            | 1                        |
-| $v_{1} = v_{-1} + v_0$ | $ D*p v_{-1} + D_p v_0 $          | 1                            | 1                        |
-| $v_{2} = sin(v_1)$     | $ \cos(v_1) D_p v_1 $             | $ \cos(11) $                 | $ \cos(11) $             |
-| $v_{3} = log(v_{-1})$  | $ \frac {1} {v_{-1}} D_p v_{-1} $ | $ \frac {1} {7} $            | 0                        |
-| $v\_{4} = v_3 + v_2 $  | $ D*p v_{3} + D_p v_2 $           | $ \frac {1} {7} + \cos(11) $ | $ \cos(11) $             |
+| $v_{-1} = x_1$         | $p_1$                           | 1                            | 0                        |
+| $v_{0} = x_2$          | $p_2$                           | 0                            | 1                        |
+| $v_{1} = v_{-1} + v_0$ | $D*p v_{-1} + D_p v_0$          | 1                            | 1                        |
+| $v_{2} = sin(v_1)$     | $\cos(v_1) D_p v_1$             | $\cos(11)$                 | $\cos(11)$             |
+| $v_{3} = log(v_{-1})$  | $\frac {1} {v_{-1}} D_p v_{-1}$ | $\frac {1} {7}$            | 0                        |
+| $v\_{4} = v_3 + v_2$  | $D*p v_{3} + D_p v_2$           | $\frac {1} {7} + \cos(11)$ | $\cos(11)$             |
 
 $D_p v_{-1} = \nabla v_{-1}^T p = (\frac {\partial v_{-1}} {\partial x_1} \nabla x_{1})^T p = (\nabla x_{1})^T p = p_1$
 
@@ -147,18 +147,18 @@ Generalizing our findings:
 
 From the table, we retrieved a pattern as below:
 
-$$ D*p v_j = (\nabla v_j)^T p = (\sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} \nabla v_i)^T p = \sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} (\nabla v_i)^T p = \sum*{i < j} \frac{\partial{v_j}} {\partial{v_i}} D_p v_i$$
+$$D*p v_j = (\nabla v_j)^T p = (\sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} \nabla v_i)^T p = \sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} (\nabla v_i)^T p = \sum*{i < j} \frac{\partial{v_j}} {\partial{v_i}} D_p v_i$$
 
 ### Reverse Mode
 
 The mechanism of reverse mode is defined as the following:
 
-_Step 1:_ Calculate $ \frac {\partial f} {\partial v_j} $
+_Step 1:_ Calculate $\frac {\partial f} {\partial v_j}$
 
-_Step 2:_ Calculate $ \frac {\partial v\_{j}} {\partial v_i} $ where $ v_i $ is the immediate predecessor of $ v_j $
+_Step 2:_ Calculate $\frac {\partial v_{j}} {\partial v_i}$ where $v_i$ is the immediate predecessor of $v_j$
 
 _Step 3:_ Multiply the result obtained in step 1 and step 2, which results in the following:
-$ \frac {\partial f} {\partial v_j} \frac {\partial v_j} {\partial v_i} $
+$\frac {\partial f} {\partial v_j} \frac {\partial v_j} {\partial v_i}$
 
 ## How to Use
 
@@ -231,25 +231,21 @@ The module adheres to the following structure:
     │   │   ├── index.html
     │   │   ├── node.html
     │   │   └── vector_function.html
-    │   ├── documentation.md
     │   └── optimization_benchmark.py
-    ├── milestone_archive
-    │   ├── milestone1.md
-    │   ├── milestone1.pdf
-    │   └── milestone2_progress.md
     ├── tests
     │   ├── __init__.py
     │   ├── conftest.py
     │   ├── elementary_test.py
     │   ├── node_test.py
     │   └── vector_function_test.py
+    ├── examples
+    │   ├── scalar_to_scalar.py
+    │   ├── scalar_to_vector_case.py
+    │   ├── vector_of_scalar_functions.py
+    │   ├── matrix_case.py
     ├── LICENSE
     ├── README.md
-    ├── pyproject.toml
-    ├── scalar_to_scalar.py
-    ├── scalar_to_vector_case.py
-    ├── matrix_case.py
-    └── vector_of_scalar_functions.py
+    └── pyproject.toml
     
 ```
 
