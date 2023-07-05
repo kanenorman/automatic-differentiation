@@ -166,7 +166,7 @@ $\frac {\partial f} {\partial v_j} \frac {\partial v_j} {\partial v_i}$
 
 Suppose we wish to take of the derivative of ```f(x) = sin(x) + x``` with respect to ```x``` at ```x = 5```. We first must first cast our variable, ```x```, as a node:
 
-```
+```python
 from autodiff_team29 import Node
 
 x = Node(symbol='x', value=5, derivative=1)
@@ -176,7 +176,7 @@ Here we have defined ```x``` by it's symbol, value, and (partial) derivative and
 
 Now we can implement our function. To do so, let's import the required elementary function, ```sin```, from the ```elementaries``` module and perform our computation. 
 
-```
+```python
 from autodiff_team29.elementaries import sin
 
 f = sin(x) + x
@@ -184,7 +184,7 @@ f = sin(x) + x
 
 If we now inspect ```f```, we see that ```f``` is a new ```Node``` with a consistent symbolic representation and correct value and derivative at ```x = 5```. 
 
-```
+```python
 repr(f)
 
 Node((sin(x)+x),4.041075725336862,1.2836621854632262)
@@ -198,9 +198,9 @@ We have provided examples of how to implement each scenario in the repository fo
 
 - Vector inputs: $f(x):\mathbb{R}^m\mapsto\mathbb{R}$. This could also be written as $f(x_1,x_2,\ldots,x_m)$ ([example script](https://github.com/kanenorman/derivative-dilemma/tree/main/examples/vector_to_scalar.py)). 
   
-- Multiple vector inputs $f(a,b)$.$f(a,b)$ can be always be cast in the form $f(x)$ where $x$ is the concatenation of $a$ and $b$. ([example_script](https://github.com/kanenorman/derivative-dilemma/tree/main/examples/vector_of_scalar_functions.py))
+- Multiple vector inputs $f(a,b)$.$f(a,b)$ can be always be cast in the form $f(x)$ where $x$ is the concatenation of $a$ and $b$. ([example script](https://github.com/kanenorman/derivative-dilemma/tree/main/examples/vector_of_scalar_functions.py))
 
-- Vector functions $f(x):\mathbb{R}^m\mapsto\mathbb{R}^n$ ([example_script](https://github.com/kanenorman/derivative-dilemma/tree/main/examples/matrix_case.py))
+- Vector functions $f(x):\mathbb{R}^m\mapsto\mathbb{R}^n$ ([example script](https://github.com/kanenorman/derivative-dilemma/tree/main/examples/matrix_case.py))
 
 
 
@@ -297,7 +297,7 @@ Now consider $f(x) = \sqrt{x}$. Square root is a relatively expensive computatio
 
 If the user wishes to disable the registry for a function with simple, unique computations, they can do so via the `set_overwrite_mode` method of the `Node` class. See the demo below for details.
 
-```
+```python
 from autodiff_team29.node import Node
 from autodiff_team29.elementaries import sqrt
 
