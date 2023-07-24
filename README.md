@@ -58,15 +58,15 @@ converts this sequence into a computational graph with which we can readily comp
 
 The underlying mechanism of automatic differentiation is the Chain Rule. It enables the decomposition of complex derivatives of into a sequence of operations of elementary functions with known derivatives. Below we present a sufficiently general formulation of the Chain Rule:
 
-$$
+```math
 \begin{align}
 \nabla f_x = \sum_{i=1}^n \frac{\partial f}{\partial y_i} \nabla y_i(x)\\
 \end{align}
-$$
+```
 
 We will first introduce the case of 1-D input and generalize it to multidimensional inputs.
 
-_One-dimensional (scalar) Input_: Suppose we have a function $ f(y(t)) $ and we want to compute the derivative of $ f $ with respect to $ t $. This derivative is given by:
+_One-dimensional (scalar) Input_: Suppose we have a function $f(y(t))$ and we want to compute the derivative of $f$ with respect to $t$. This derivative is given by:
 
 $$
 \begin{align}
@@ -104,21 +104,35 @@ $D_pv=Jp$
 
 Seed vectors provide an efficient way to retrieve every element in a Jacobian matrix and also recover the full Jacobian in high dimensions.
 
-Seed vectors often come into play when we want to find $\frac {\partial f_i} {\partial x_j}$, which corresponds to the $i, j$ element of the Jacobian matrix. In high dimension automatic differentiation, we will apply seed vectors at the end of the evaluation trace where we have recursively calculated the explicit forms of tangent trace of $f_i$ and then multiply each of them by the indicator vector $ p_j $ where the $j^{th}$ element of the $p$ vector is 1.
+Seed vectors often come into play when we want to find $\frac {\partial f_i} {\partial x_j}$, which corresponds to the $i, j$ element of the Jacobian matrix. In high dimension automatic differentiation, we will apply seed vectors at the end of the evaluation trace where we have recursively calculated the explicit forms of tangent trace of $f_i$ and then multiply each of them by the indicator vector $p_j$ where the $j^{th}$ element of the $p$ vector is 1.
 
 ### Evaluation (Forward) Trace
 
-_Definition_: Suppose $x = \begin{bmatrix} x_1 \\ \ldots \\ x_m \end{bmatrix}^T $, we defined $ v\_{k - m} = x_k $ for $ k = 1, 2, ..., m $ in the evaluation trace.
+_Definition_: Suppose 
 
-_Motivation_: The evaluation trace introduces intermediate results $ v\_{k-m} $ of elementary operations to track the differentiation.
+```math 
+x = \begin{bmatrix} x_1 \\ \ldots \\ x_m \end{bmatrix}^T
+```
 
-Consider the function $ f(x):\mathbb{R}^2 \to \mathbb{R} $:
+we defined 
+```math
+v\_{k - m} = x_k  \text{ for }  k = 1, 2, ..., m
+```
+in the evaluation trace.
 
-$ f(x) = log(x_1) + sin(x_1 + x_2) $
+_Motivation_: The evaluation trace introduces intermediate results $v\_{k-m}$ of elementary operations to track the differentiation.
 
-We want to evaluate the gradient $ \nabla f $ at the point $ x = \begin{bmatrix} 7 \\ 4 \end{bmatrix} $. Computing the gradient manually:
+Consider the function $f(x):\mathbb{R}^2 \to \mathbb{R}$: $f(x) = log(x_1) + sin(x_1 + x_2)$
 
-$ \nabla f = \begin{bmatrix} \frac {\partial f} {\partial x_1} \\ \frac {\partial f} {\partial x_2} \end{bmatrix} = \begin{bmatrix} \frac {1} {x_1} + \cos(x_1 + x_2) \\ \cos(x_1 + x_2) \end{bmatrix} = \begin{bmatrix} \frac {1} {7} + \cos(11) \\ \cos(11) \end{bmatrix}$
+We want to evaluate the gradient $\nabla f$ at the point 
+```math
+x = \begin{bmatrix} 7 \\ 4 \end{bmatrix}
+```
+Computing the gradient manually:
+
+```math
+\nabla f = \begin{bmatrix} \frac {\partial f} {\partial x_1} \\ \frac {\partial f} {\partial x_2} \end{bmatrix} = \begin{bmatrix} \frac {1} {x_1} + \cos(x_1 + x_2) \\ \cos(x_1 + x_2) \end{bmatrix} = \begin{bmatrix} \frac {1} {7} + \cos(11) \\ \cos(11) \end{bmatrix}
+```
 
 | Forward primal trace   | Forward tangent trace             | Pass with p = $[0, 1]^T$     | Pass with p = $[1, 0]^T$ |
 | ---------------------- | --------------------------------- | ---------------------------- | ------------------------ |
@@ -147,7 +161,9 @@ Generalizing our findings:
 
 From the table, we retrieved a pattern as below:
 
-$$D*p v_j = (\nabla v_j)^T p = (\sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} \nabla v_i)^T p = \sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} (\nabla v_i)^T p = \sum*{i < j} \frac{\partial{v_j}} {\partial{v_i}} D_p v_i$$
+```math
+D*p v_j = (\nabla v_j)^T p = (\sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} \nabla v_i)^T p = \sum*{i < j} \frac{\partial{v*j}} {\partial{v_i}} (\nabla v_i)^T p = \sum*{i < j} \frac{\partial{v_j}} {\partial{v_i}} D_p v_i
+```
 
 ### Reverse Mode
 
